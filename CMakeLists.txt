@@ -16,4 +16,5 @@ add_executable(produc-tuity source/main.cpp)
 target_link_libraries(produc-tuity
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
+    PRIVATE ftxui::component
 )
