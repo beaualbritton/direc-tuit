@@ -16,4 +16,5 @@ public:
 
   void setupWindow();
   void run();
+  Element getStartMenu(bool userSet);
 };

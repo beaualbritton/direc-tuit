@@ -3,7 +3,12 @@
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <string>
 using namespace ftxui;
+using std::string;
+
+Element userDialogueWindow();
+Element introWindow();
 
 WindowRender::WindowRender() { setupWindow(); }
 
@@ -12,9 +17,7 @@ void WindowRender::setupWindow() {
 
   title = text("produc-tuity");
   content = vbox({paragraph("welcome to produc-tuity")});
-
-  currentWindow = window(title | bold, content);
-
+  currentWindow = userDialogueWindow(); // window(title | bold, content);
   windowComponent = Renderer([&] { return currentWindow; });
 }
 
@@ -27,4 +30,31 @@ void WindowRender::run() {
     return false;
   });
   screen.Loop(windowComponent);
+}
+Element WindowRender::getStartMenu(bool userSet) {
+  Element startWindow;
+  if (!userSet) {
+    startWindow = userDialogueWindow();
+
+  } else {
+    startWindow = introWindow();
+  }
+  return startWindow;
+}
+Element userDialogueWindow() {
+  Element cWindow;
+  string userName;
+  Component inputName = Input(&userName, "Name");
+
+  Element content = vbox(text("hello ☺ " + userName), inputName->Render());
+
+  Element title = text("produc-tuity");
+
+  cWindow = window(title | bold, content);
+
+  return cWindow;
+}
+Element introWindow() {
+  Element e;
+  return e;
 }
