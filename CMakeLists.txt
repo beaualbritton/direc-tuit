@@ -12,7 +12,8 @@ FetchContent_Declare(ftxui
   GIT_TAG v6.1.9
 )
 FetchContent_MakeAvailable(ftxui)
-add_executable(produc-tuity source/main.cpp)
+add_executable(produc-tuity source/main.cpp
+source/window.cpp)
 target_link_libraries(produc-tuity
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
