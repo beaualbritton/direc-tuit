@@ -3,7 +3,8 @@
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
 
-class WindowRender {
+class WindowRender
+{
 public:
   // screen (terminal screen)
   inline static ScreenInteractive screen = ScreenInteractive::Fullscreen();
@@ -16,5 +17,5 @@ public:
 
   void setupWindow();
   void run();
-  Element getStartMenu(bool userSet);
+  // Element getStartMenu(bool userSet);
 };

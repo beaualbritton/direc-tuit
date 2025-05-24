@@ -5,7 +5,8 @@
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
 
-int main() {
+int main()
+{
   // Displaying fullscreen in terminal interface. Takes width/height of current
   // viewport. See ftxui/component/screen_interactive.hpp
   WindowRender productuityWindow;

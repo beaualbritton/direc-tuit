@@ -1,4 +1,5 @@
 #include "window.hpp"
+#include "dialogue_window.hpp"
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/screen_interactive.hpp>
@@ -7,23 +8,23 @@
 using namespace ftxui;
 using std::string;
 
-Element userDialogueWindow();
-Element introWindow();
+WindowRender::WindowRender() {}
 
-WindowRender::WindowRender() { setupWindow(); }
-
-void WindowRender::setupWindow() {
+void WindowRender::setupWindow()
+{
   Element title, content;
 
   title = text("produc-tuity");
   content = vbox({paragraph("welcome to produc-tuity")});
-  currentWindow = userDialogueWindow(); // window(title | bold, content);
-  windowComponent = Renderer([&] { return currentWindow; });
+  // currentWindow = userDialogueWindow(); // window(title | bold, content);
+  windowComponent = userDialogueWindow();
 }
 
-void WindowRender::run() {
+void WindowRender::run()
+{
   windowComponent = CatchEvent(windowComponent, [&](Event event) {
-    if (event == Event::Character('q')) {
+    if (event == Event::Character('q'))
+    {
       screen.ExitLoopClosure()();
       return true;
     }
@@ -31,30 +32,16 @@ void WindowRender::run() {
   });
   screen.Loop(windowComponent);
 }
-Element WindowRender::getStartMenu(bool userSet) {
-  Element startWindow;
-  if (!userSet) {
-    startWindow = userDialogueWindow();
-
-  } else {
-    startWindow = introWindow();
-  }
-  return startWindow;
-}
-Element userDialogueWindow() {
-  Element cWindow;
-  string userName;
-  Component inputName = Input(&userName, "Name");
-
-  Element content = vbox(text("hello ☺ " + userName), inputName->Render());
-
-  Element title = text("produc-tuity");
-
-  cWindow = window(title | bold, content);
-
-  return cWindow;
-}
-Element introWindow() {
-  Element e;
-  return e;
-}
+// Element WindowRender::getStartMenu(bool userSet)
+//{
+//   Element startWindow;
+//   if (!userSet)
+//   {
+//     startWindow = userDialogueWindow();
+//   }
+//   else
+//   {
+//     startWindow = introWindow();
+//   }
+//   return startWindow;
+// }

@@ -13,7 +13,8 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 add_executable(produc-tuity source/main.cpp
-source/window.cpp)
+source/window.cpp
+source/dialogue_window.cpp)
 target_link_libraries(produc-tuity
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
