@@ -14,10 +14,10 @@ int main()
 
   // Displaying fullscreen in terminal interface. Takes width/height of current
   // viewport. See ftxui/component/screen_interactive.hpp
-  //  WindowRender productuityWindow;
-  //
-  //  productuityWindow.setupWindow();
-  //  productuityWindow.run();
+  WindowRender productuityWindow;
+
+  productuityWindow.setupWindow();
+  productuityWindow.run();
   // Renderer component that will be passed to screen.loop()
   // Within that renderer is a single window (with just text for now)
   return 0;

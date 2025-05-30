@@ -35,3 +35,5 @@
 build/
 .cache/
 
+#produc-tuity files
+.config/
