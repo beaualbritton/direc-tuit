@@ -16,5 +16,5 @@ void initDirectory();
 void loadDirectory();
 
 // pretty explicit
-string getUsername();
-void setUsername();
+string *getUsername();
+void setUsername(string *username);
