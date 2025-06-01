@@ -14,7 +14,7 @@ using namespace ftxui;
 using namespace std;
 // using std::string;
 // using std::filesystem::create_directory; using std::filesystem::exists;
-using std::filesystem::path;
+using std::filesystem::path, std::shared_ptr, std::make_shared;
 
 const path dirPath = ".config";
 const path filePath = dirPath / "userconfig.toml";
@@ -51,9 +51,10 @@ void initDirectory()
   }
 }
 // Uses toml++ parsing for efficient&readable reads/writes to config
-string *getUsername()
+shared_ptr<string> getUsername()
 {
-  string *username = nullptr;
+  shared_ptr<string> username = make_shared<string>();
+  //  string *username = nullptr;
   try
   {
     toml::table user_table = toml::parse_file(filePath.string());
@@ -68,11 +69,11 @@ string *getUsername()
       // it's a string to begin with. otherwise we'd be dereferencing *username
       // (which is nullptr at this point) if you change this... beware of
       // segfaults ^_^
-      username = new string(*value.as_string());
+      username = make_unique<string>(*value.as_string());
     }
     else
     {
-      username = new string("null");
+      username = make_unique<string>("null");
     }
 
   }

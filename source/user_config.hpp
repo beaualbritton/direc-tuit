@@ -3,7 +3,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
-using std::string;
+using std::string, std::shared_ptr, std::make_shared;
 
 // returns t/f based on if there is an initialized .produc-tuity directory in
 // this repo
@@ -16,5 +16,5 @@ void initDirectory();
 void loadDirectory();
 
 // pretty explicit
-string *getUsername();
+shared_ptr<string> getUsername();
 void setUsername(string *username);
