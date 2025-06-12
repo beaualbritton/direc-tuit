@@ -8,30 +8,36 @@
 using namespace ftxui;
 using std::string;
 
-WindowRender::WindowRender() {}
-
-void WindowRender::setupWindow()
-{
-  Element title, content;
-
-  title = text("produc-tuity");
-  content = vbox({paragraph("welcome to produc-tuity")});
-  // currentWindow = userDialogueWindow(); // window(title | bold, content);
-  windowComponent = userDialogueWindow();
+void WindowRender::setupWindow() {
+  // TODO: change this based on config
+  setWindow(userDialogueWindow());
+}
+/*
+ * not currently in use as setWindow allows for nested active windows
+ */
+void WindowRender::run() {
+  //  rootWindow = CatchEvent(rootWindow, [&](Event event) {
+  //    if (event == Event::Character('q')) {
+  //      screen.ExitLoopClosure()();
+  //      return true;
+  //    }
+  //    return false;
+  //  });
+  //  screen.Loop(rootWindow);
 }
 
-void WindowRender::run()
-{
-  windowComponent = CatchEvent(windowComponent, [&](Event event) {
-    if (event == Event::Character('q'))
-    {
+void WindowRender::setWindow(Component cWindow) {
+  rootWindow = cWindow;
+  rootWindow = CatchEvent(rootWindow, [&](Event event) {
+    if (event == Event::Character('q')) {
       screen.ExitLoopClosure()();
       return true;
     }
     return false;
   });
-  screen.Loop(windowComponent);
+  screen.Loop(rootWindow);
 }
+
 // Element WindowRender::getStartMenu(bool userSet)
 //{
 //   Element startWindow;
