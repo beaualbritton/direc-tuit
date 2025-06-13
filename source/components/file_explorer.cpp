@@ -51,19 +51,20 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
     }
   });
   pContainer->Add(parentDirButton);
+  shared_ptr<string> sharedString = make_shared<string>();
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
     const path iterPath = entry.path();
     string label;
     if (is_directory(iterPath))
-      label = ": ";
+      label = ": " + iterPath.filename().string();
     else
-      label = ": ";
-    Component fileButton =
-        Button(label + string(iterPath), [iterPath, pContainer] {
-          if (is_directory(iterPath)) {
-            populate(pContainer, iterPath);
-          }
-        });
+      label = ": " + iterPath.filename().string();
+    *sharedString = label;
+    Component fileButton = Button(*sharedString, [iterPath, pContainer] {
+      if (is_directory(iterPath)) {
+        populate(pContainer, iterPath);
+      }
+    });
     pContainer->Add(fileButton);
   }
 }
