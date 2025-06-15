@@ -18,9 +18,6 @@ using std::filesystem::path, std::filesystem::is_directory, std::shared_ptr,
 Component fileExplorer() {
   // Navigates to ~/
   path currentPath = std::filesystem::current_path();
-  Component homeButton = Button(string("home"), [] {});
-
-  Component homeButton1 = Button(string(currentPath), [] {});
   // Get current directory and sub-directories & files
   // container for fileButtons
 
@@ -59,11 +56,14 @@ Component fileExplorer() {
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   pContainer->DetachAllChildren();
 
-  Component parentDirButton = Button("../", [pPath, pContainer] {
-    if (pPath.has_parent_path() && is_directory(pPath.parent_path())) {
-      populate(pContainer, pPath.parent_path());
-    }
-  });
+  Component parentDirButton = Button(
+      "../",
+      [pPath, pContainer] {
+        if (pPath.has_parent_path()) {
+          populate(pContainer, pPath.parent_path());
+        }
+      },
+      ButtonOption::Ascii());
   pContainer->Add(parentDirButton);
   shared_ptr<string> sharedString = make_shared<string>();
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
@@ -75,11 +75,14 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
       label += ": ";
     label += iterPath.filename().string();
     *sharedString = label;
-    Component fileButton = Button(*sharedString, [iterPath, pContainer] {
-      if (is_directory(iterPath)) {
-        populate(pContainer, iterPath);
-      }
-    });
+    Component fileButton = Button(
+        *sharedString,
+        [iterPath, pContainer] {
+          if (is_directory(iterPath)) {
+            populate(pContainer, iterPath);
+          }
+        },
+        ButtonOption::Ascii());
     pContainer->Add(fileButton);
   }
 }
