@@ -55,7 +55,6 @@ Component fileExplorer() {
 // container or vector (for separate tabs/sidebars that will be added)
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   pContainer->DetachAllChildren();
-
   Component parentDirButton = Button(
       "../",
       [pPath, pContainer] {
@@ -65,15 +64,14 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
       },
       ButtonOption::Ascii());
   pContainer->Add(parentDirButton);
+
   shared_ptr<string> sharedString = make_shared<string>();
+  string label;
+  int wrapCount = 0;
+  Component wrapContainer = Container::Horizontal({});
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
     const path iterPath = entry.path();
-    string label = "";
-    if (is_directory(iterPath))
-      label += ": "; //+ iterPath.filename().string();
-    else
-      label += ": ";
-    label += iterPath.filename().string();
+    label = is_directory(iterPath) ? "" : "";
     *sharedString = label;
     Component fileButton = Button(
         *sharedString,
@@ -83,6 +81,24 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
           }
         },
         ButtonOption::Ascii());
-    pContainer->Add(fileButton);
+    Component buttonText = Renderer([iterPath] {
+      return text(string(iterPath.filename())) |
+             size(ftxui::WIDTH, ftxui::EQUAL, 10);
+    });
+
+    Component vContainer = Container::Vertical({fileButton, buttonText});
+
+    Component renderSeparator = Renderer([] { return separator(); });
+    wrapContainer->Add(vContainer);
+    wrapContainer->Add(renderSeparator);
+    ++wrapCount;
+    if (wrapCount >= 4) {
+      pContainer->Add(wrapContainer);
+      wrapCount = 0;
+      wrapContainer = Container::Horizontal({});
+    }
+  }
+  if (wrapCount > 0) {
+    pContainer->Add(wrapContainer);
   }
 }
