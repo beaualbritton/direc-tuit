@@ -6,6 +6,7 @@
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/node.hpp>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -55,6 +56,14 @@ Component fileExplorer() {
 // container or vector (for separate tabs/sidebars that will be added)
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   pContainer->DetachAllChildren();
+
+  shared_ptr<string> sharedString = make_shared<string>();
+  Component currentDirLabel =
+      Renderer([pPath] { return text(string(pPath.filename())); });
+
+  string label;
+  int wrapCount = 0;
+
   Component parentDirButton = Button(
       "../",
       [pPath, pContainer] {
@@ -63,12 +72,12 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         }
       },
       ButtonOption::Ascii());
-  pContainer->Add(parentDirButton);
-
-  shared_ptr<string> sharedString = make_shared<string>();
-  string label;
-  int wrapCount = 0;
+  Component currentDirContainer =
+      Container::Horizontal({parentDirButton, currentDirLabel});
+  pContainer->Add(currentDirContainer);
+  pContainer->Add(Renderer([] { return separator(); }));
   Component wrapContainer = Container::Horizontal({});
+
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
     const path iterPath = entry.path();
     label = is_directory(iterPath) ? "" : "";
