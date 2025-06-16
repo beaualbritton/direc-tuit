@@ -9,3 +9,5 @@ using namespace ftxui;
 Component fileExplorer();
 void populate(std::shared_ptr<ComponentBase> pContainer,
               const std::filesystem::path &pPath);
+void getUserPinned(Component pContainer, Component fileContainer);
+std::filesystem::path homeDir();
