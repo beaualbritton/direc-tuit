@@ -1,23 +1,25 @@
 #include "file_explorer.hpp"
 #include <filesystem>
-#include <fstream>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
-#include <iostream>
+#include <ftxui/screen/terminal.hpp>
 #include <memory>
-#include <vector>
-
 using namespace ftxui;
-
 using std::filesystem::path, std::filesystem::is_directory, std::shared_ptr,
-    std::make_shared, std::vector, std::string;
+    std::make_shared, std::string;
+
+// Some constants for screen size.
+auto terminalSize = Terminal::Size();
+const int TERM_WIDTH = terminalSize.dimx;
+const int TERM_HEIGHT = terminalSize.dimy;
+const int EXPLORER_WIDTH = TERM_WIDTH * 0.85;
+const int EXPLORER_HEIGHT = TERM_HEIGHT * 0.75;
 
 Component fileExplorer() {
-  // Navigates to ~/
   path currentPath = std::filesystem::current_path();
   // Get current directory and sub-directories & files
   // container for fileButtons
@@ -30,12 +32,9 @@ Component fileExplorer() {
       Container::Horizontal({fileContainer});
   populate(fileContainer, currentPath);
 
-  // TODO: ADD OPERATIONS (make, delete, open)
-
   /*
    TODO: ADD:
    * -Sidebar with pinned dirs (Home, Desktop, Documents, etc.)
-   * -Text that displays current directory name
    * -Use existing directory or make new? (new function/popup)
    * -pointerSelect button
    *  Input box for typing
@@ -46,16 +45,15 @@ Component fileExplorer() {
   Component explorer = Renderer(baseContainer, [=] {
     return window(text("file explorer"),
                   vbox({
-                      (baseContainer->Render() | // TODO: proper screen ratios
-                       size(ftxui::WIDTH, ftxui::EQUAL, 80) |
-                       size(ftxui::HEIGHT, ftxui::EQUAL, 60)),
+                      (baseContainer->Render() |
+                       size(WIDTH, EQUAL, EXPLORER_WIDTH) |
+                       size(HEIGHT, EQUAL, EXPLORER_HEIGHT)),
                   })) |
            center | vcenter;
   });
   return explorer;
 }
-// TODO: instead of populate populating THE ENTIRE container, just have a nested
-// container or vector (for separate tabs/sidebars that will be added)
+
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   pContainer->DetachAllChildren();
 
@@ -83,14 +81,16 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   Component horizontalContainer = Container::Horizontal({});
   Component pinnedContainer = Container::Vertical({});
+  int scrollVal = 0;
   Component bodyContainer = Container::Vertical({});
 
   horizontalContainer->Add(Renderer(pinnedContainer, [pinnedContainer] {
-    return pinnedContainer->Render() | size(ftxui::WIDTH, ftxui::EQUAL, 10);
+    return pinnedContainer->Render() |
+           size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.175);
   }));
   horizontalContainer->Add(Renderer([] { return separator(); }));
   horizontalContainer->Add(Renderer(bodyContainer, [bodyContainer] {
-    return bodyContainer->Render() | size(WIDTH, EQUAL, 70);
+    return bodyContainer->Render() | size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.825);
   }));
 
   getUserPinned(pinnedContainer, pContainer);
@@ -110,7 +110,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         ButtonOption::Ascii());
     Component buttonText = Renderer([iterPath] {
       return text(string(iterPath.filename())) |
-             size(ftxui::WIDTH, ftxui::EQUAL, 10);
+             size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.875) - 4) / 5) | flex;
     });
 
     Component vContainer = Container::Vertical({fileButton, buttonText});
@@ -119,7 +119,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
     wrapContainer->Add(vContainer);
     wrapContainer->Add(renderSeparator);
     ++wrapCount;
-    if (wrapCount >= 4) {
+    if (wrapCount >= 5) {
       bodyContainer->Add(wrapContainer);
       wrapCount = 0;
       wrapContainer = Container::Horizontal({});
@@ -150,11 +150,13 @@ void getUserPinned(Component pContainer, Component fileContainer) {
   Component recentContainer = Container::Vertical({});
   path hDir = homeDir();
   Component homeButton = Button(
-      "", [hDir, fileContainer] { populate(fileContainer, hDir); },
+      ": " + string(hDir.filename()),
+      [hDir, fileContainer] { populate(fileContainer, hDir); },
       ButtonOption::Ascii());
 
   globalContainer->Add(homeButton);
   recentContainer->Add(Renderer([] { return text("none"); }));
+
   pContainer->Add(globalContainer);
   pContainer->Add(recentContainer);
 }
