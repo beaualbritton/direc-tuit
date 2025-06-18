@@ -19,49 +19,38 @@ using std::filesystem::path, std::shared_ptr, std::make_shared;
 const path dirPath = ".config";
 const path filePath = dirPath / "userconfig.toml";
 
-bool checkConfig()
-{
+bool checkConfig() {
   bool pathExists = exists(dirPath);
-  if (pathExists)
-  {
+  if (pathExists) {
     // loadDirectory();
-  }
-  else
-  {
+  } else {
     initDirectory();
   }
   return pathExists;
 }
 
-void initDirectory()
-{
+void initDirectory() {
   // create directory
   create_directory(dirPath);
   // create user_config file
   // filesystem lib magic
   ofstream configFile(filePath);
-  if (configFile)
-  {
+  if (configFile) {
     configFile << "";
     configFile.close();
-  }
-  else
-  {
+  } else {
     cout << "problem loading config";
   }
 }
 // Uses toml++ parsing for efficient&readable reads/writes to config
-shared_ptr<string> getUsername()
-{
+shared_ptr<string> getUsername() {
   shared_ptr<string> username = make_shared<string>();
   //  string *username = nullptr;
-  try
-  {
+  try {
     toml::table user_table = toml::parse_file(filePath.string());
     auto value = user_table["username"];
     // checking types so no crazy shit happens
-    if (value.is_string())
-    {
+    if (value.is_string()) {
       // toml++ is weird because as_string() returns value<std::string>*. not
       // std::string* ? weird asf.. so doing some shotty dereferencing here to
       // get the actual value of the value<std::string> (devs pick a better name
@@ -70,38 +59,49 @@ shared_ptr<string> getUsername()
       // (which is nullptr at this point) if you change this... beware of
       // segfaults ^_^
       username = make_unique<string>(*value.as_string());
-    }
-    else
-    {
+    } else {
       username = make_unique<string>("null");
     }
 
   }
   // TODO: comprehensive catch, not just generic print.
-  catch (toml::parse_error &err)
-  {
+  catch (toml::parse_error &err) {
     cout << "parsing failed: " << err;
   }
   return username;
 }
 
 // sets username using toml parsing
-void setUsername(string *username)
-{
-  try
-  {
+void setUsername(string *username) {
+  try {
     toml::table user_table = toml::parse_file(filePath.string());
 
     user_table.insert_or_assign("username", *username);
     ofstream configFile(filePath);
-    if (configFile)
-    {
+    if (configFile) {
       configFile << user_table;
     }
   }
   // TODO: again more comprehensive catches
-  catch (const toml::parse_error &err)
-  {
+  catch (const toml::parse_error &err) {
     cout << "assigning username failed: " << err;
+  }
+}
+/*
+ * sets the preferred path for produc-tuity files & such in .config/user_config
+ */
+void setPreferredPath(filesystem::path pPath) {
+  try {
+    toml::table path_table = toml::parse_file(filePath.string());
+
+    path_table.insert_or_assign("path", string(pPath));
+    ofstream configFile(filePath);
+    if (configFile) {
+      configFile << path_table;
+    }
+  }
+  // TODO: again more comprehensive catches
+  catch (const toml::parse_error &err) {
+    cout << "assigning path failed: " << err;
   }
 }

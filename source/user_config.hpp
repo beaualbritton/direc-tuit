@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/screen_interactive.hpp>
@@ -18,3 +19,6 @@ void loadDirectory();
 // pretty explicit
 shared_ptr<string> getUsername();
 void setUsername(string *username);
+
+void setPreferredPath(std::filesystem::path pPath);
+void pinDirectory(std::filesystem::path pDir);
