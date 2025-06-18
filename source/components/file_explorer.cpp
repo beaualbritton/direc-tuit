@@ -98,13 +98,13 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   horizontalContainer->Add(Renderer(pinnedContainer, [pinnedContainer] {
     return pinnedContainer->Render() |
-           size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.175);
+           size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.1875);
   }));
   horizontalContainer->Add(Renderer([] { return separator(); }));
   horizontalContainer->Add(Renderer(bodyContainer, [bodyContainer] {
     return bodyContainer->Render() |
            size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.825) |
-           size(HEIGHT, EQUAL, EXPLORER_HEIGHT * 0.85);
+           size(HEIGHT, EQUAL, EXPLORER_HEIGHT) | frame | vscroll_indicator;
   }));
 
   getUserPinned(pinnedContainer, pContainer);
@@ -113,17 +113,19 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
     const path iterPath = entry.path();
     string label = is_directory(iterPath) ? "" : "";
+    *sharedString = label;
     Component fileButton = Button(
-        label,
+        is_directory(iterPath) ? "" : "",
         [iterPath, pContainer] {
           if (is_directory(iterPath)) {
             populate(pContainer, iterPath);
           }
         },
         ButtonOption::Ascii());
-    Component buttonText = Renderer([iterPath] {
-      return text(string(iterPath.filename())) |
-             size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.875) - 4) / 5);
+    string textString = string(iterPath.filename());
+    Component buttonText = Renderer([textString, iterPath] {
+      return text(iterPath.empty() ? "Empty " : textString) |
+             size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.825) - 4) / 5);
     });
 
     Component vContainer = Container::Vertical({fileButton, buttonText});
