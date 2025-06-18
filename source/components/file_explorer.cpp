@@ -55,13 +55,25 @@ Component fileExplorer() {
 }
 
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
+  /*
+   TODO:
+   FIX CRASH ON MOUSE EVENT
+   I've boiled it down to this line here,
+   This function works properly with keyboard input. No issues, thoroughly
+   tested. However, the story is much different for mouse clicks. I'm fairly
+   certain the mouse click event is not handled in the same way that buttons
+   are.
+
+   Commenting out DetachAllChildren breaks functionality (stacks explorer
+   frames) but does not crash when mouse is clicked.
+   */
+
   pContainer->DetachAllChildren();
 
   shared_ptr<string> sharedString = make_shared<string>();
   Component currentDirLabel =
       Renderer([pPath] { return text(string(pPath.filename())); });
 
-  string label;
   int wrapCount = 0;
 
   Component parentDirButton = Button(
@@ -90,7 +102,9 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   }));
   horizontalContainer->Add(Renderer([] { return separator(); }));
   horizontalContainer->Add(Renderer(bodyContainer, [bodyContainer] {
-    return bodyContainer->Render() | size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.825);
+    return bodyContainer->Render() |
+           size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.825) |
+           size(HEIGHT, EQUAL, EXPLORER_HEIGHT * 0.85);
   }));
 
   getUserPinned(pinnedContainer, pContainer);
@@ -98,10 +112,9 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   Component wrapContainer = Container::Horizontal({});
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
     const path iterPath = entry.path();
-    label = is_directory(iterPath) ? "" : "";
-    *sharedString = label;
+    string label = is_directory(iterPath) ? "" : "";
     Component fileButton = Button(
-        *sharedString,
+        label,
         [iterPath, pContainer] {
           if (is_directory(iterPath)) {
             populate(pContainer, iterPath);
@@ -110,7 +123,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         ButtonOption::Ascii());
     Component buttonText = Renderer([iterPath] {
       return text(string(iterPath.filename())) |
-             size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.875) - 4) / 5) | flex;
+             size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.875) - 4) / 5);
     });
 
     Component vContainer = Container::Vertical({fileButton, buttonText});
@@ -132,7 +145,22 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   pContainer->Add(horizontalContainer);
 
+  pContainer->Add(Renderer([] { return separator(); }));
+
   // TODO: add submit bar
+  Component submitContainer = Container::Horizontal({});
+
+  Component submitButton, cancelButton;
+  // Submits current directory to .config for prefered directory to store info.
+  submitButton = Button("Submit.", [] {}, ButtonOption::Ascii());
+  // Quits current operation (q behavior)
+  cancelButton = Button("Cancel.", [] {}, ButtonOption::Ascii());
+  submitContainer->Add(submitButton);
+  submitContainer->Add(cancelButton);
+  pContainer->Add(Renderer(submitContainer, [submitContainer] {
+    return submitContainer->Render() |
+           size(HEIGHT, EQUAL, EXPLORER_HEIGHT * 0.15f);
+  }));
 }
 
 /*
