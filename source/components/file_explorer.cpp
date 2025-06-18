@@ -6,6 +6,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
+#include <ftxui/screen/screen.hpp>
 #include <ftxui/screen/terminal.hpp>
 #include <memory>
 using namespace ftxui;
@@ -155,8 +156,13 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   Component submitButton, cancelButton;
   // Submits current directory to .config for prefered directory to store info.
   submitButton = Button("Submit.", [] {}, ButtonOption::Ascii());
+
+  // Get current screen
+  auto *activeScreen = ScreenInteractive::Active();
+
   // Quits current operation (q behavior)
-  cancelButton = Button("Cancel.", [] {}, ButtonOption::Ascii());
+  cancelButton =
+      Button("Cancel.", activeScreen->ExitLoopClosure(), ButtonOption::Ascii());
   submitContainer->Add(submitButton);
   submitContainer->Add(cancelButton);
   pContainer->Add(Renderer(submitContainer, [submitContainer] {
