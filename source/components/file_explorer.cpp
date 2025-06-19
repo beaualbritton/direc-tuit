@@ -127,6 +127,8 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
     Component catchFileEvents = CatchEvent(fileButton, [=](Event event) {
       if (event == Event::Character('p')) { /*call pinned dir */
         pinDirectory(iterPath);
+        pinnedContainer->DetachAllChildren();
+        getUserPinned(pinnedContainer, pContainer);
         return true;
       }
       return false;
