@@ -105,3 +105,46 @@ void setPreferredPath(filesystem::path pPath) {
     cout << "assigning path failed: " << err;
   }
 }
+void pinDirectory(filesystem::path pDir) {
+  try {
+    toml::table path_table = toml::parse_file(filePath.string());
+
+    toml::array *path_list = path_table["pinned"].as_array();
+    if (!path_list) {
+      path_table.insert_or_assign("pinned", toml::array{});
+      path_list = path_table["pinned"].as_array();
+    }
+    path_list->push_back(pDir.string());
+
+    ofstream configFile(filePath);
+    if (configFile) {
+      configFile << path_table;
+    }
+  }
+  // TODO: again more comprehensive catches
+  catch (const toml::parse_error &err) {
+    cout << "assigning path failed: " << err;
+  }
+}
+
+vector<filesystem::path> getPinnedDirs() {
+  vector<filesystem::path> pinDirVector;
+  try {
+    toml::table path_table = toml::parse_file(filePath.string());
+    toml::array *path_list = path_table["pinned"].as_array();
+    if (!path_list)
+      // return empty vector
+      return vector<filesystem::path>();
+
+    for (auto &pin : *path_list) {
+      auto *strPin = pin.as_string();
+      if (strPin != nullptr) {
+        pinDirVector.emplace_back(strPin->get());
+      }
+    }
+
+  } catch (const toml::parse_error &err) {
+    cout << "assigning path failed: " << err;
+  }
+  return pinDirVector;
+}

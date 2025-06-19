@@ -124,13 +124,20 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
           }
         },
         ButtonOption::Ascii());
+    Component catchFileEvents = CatchEvent(fileButton, [=](Event event) {
+      if (event == Event::Character('p')) { /*call pinned dir */
+        pinDirectory(iterPath);
+        return true;
+      }
+      return false;
+    });
     string textString = string(iterPath.filename());
     Component buttonText = Renderer([textString, iterPath] {
       return text(iterPath.empty() ? "Empty " : textString) |
              size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.825) - 4) / 5);
     });
 
-    Component vContainer = Container::Vertical({fileButton, buttonText});
+    Component vContainer = Container::Vertical({catchFileEvents, buttonText});
 
     Component renderSeparator = Renderer([] { return separator(); });
     wrapContainer->Add(vContainer);
@@ -198,7 +205,17 @@ void getUserPinned(Component pContainer, Component fileContainer) {
       [hDir, fileContainer] { populate(fileContainer, hDir); },
       ButtonOption::Ascii());
 
+  std::vector<path> pinnedDirs = getPinnedDirs();
+
   globalContainer->Add(homeButton);
+  for (path p : pinnedDirs) {
+    Component currentPinButton = Button(
+        ": " + p.filename().string(),
+        [p, fileContainer] { populate(fileContainer, p); },
+        ButtonOption::Ascii());
+    globalContainer->Add(currentPinButton);
+  }
+
   recentContainer->Add(Renderer([] { return text("none"); }));
 
   pContainer->Add(globalContainer);
