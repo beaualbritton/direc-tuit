@@ -209,13 +209,26 @@ void getUserPinned(Component pContainer, Component fileContainer) {
 
   std::vector<path> pinnedDirs = getPinnedDirs();
 
+  /*
+   TODO:
+   delete pins w/user_config & catch event wrapper
+    */
   globalContainer->Add(homeButton);
   for (path p : pinnedDirs) {
     Component currentPinButton = Button(
         ": " + p.filename().string(),
         [p, fileContainer] { populate(fileContainer, p); },
         ButtonOption::Ascii());
-    globalContainer->Add(currentPinButton);
+    Component buttonWrapper = CatchEvent(currentPinButton, [=](Event event) {
+      if (event == Event::Character('d')) { /*call pinned dir */
+        deletePin(p);
+        pContainer->DetachAllChildren();
+        getUserPinned(pContainer, fileContainer);
+        return true;
+      }
+      return false;
+    });
+    globalContainer->Add(buttonWrapper);
   }
 
   recentContainer->Add(Renderer([] { return text("none"); }));

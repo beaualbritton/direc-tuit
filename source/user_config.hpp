@@ -23,3 +23,4 @@ void setUsername(string *username);
 void setPreferredPath(std::filesystem::path pPath);
 void pinDirectory(std::filesystem::path pDir);
 std::vector<std::filesystem::path> getPinnedDirs();
+void deletePin(std::filesystem::path pDir);

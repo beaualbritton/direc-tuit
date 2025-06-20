@@ -1,4 +1,5 @@
 #include "user_config.hpp"
+#include <algorithm>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/screen_interactive.hpp>
@@ -8,6 +9,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <toml++/impl/parse_error.hpp>
+#include <toml++/impl/parser.hpp>
 #include <toml++/toml.hpp>
 
 using namespace ftxui;
@@ -124,6 +127,45 @@ void pinDirectory(filesystem::path pDir) {
   // TODO: again more comprehensive catches
   catch (const toml::parse_error &err) {
     cout << "assigning path failed: " << err;
+  }
+}
+/*
+ * TODO: implement
+ */
+void deletePin(filesystem::path pDir) {
+  // Deletes selected path from pin list in .config/user_config.toml
+  //
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    toml::array *pin_array = config_table["pinned"].as_array();
+    if (!pin_array) {
+      // No pins to delete
+      return;
+    }
+    // Toml++ provides no erase(value) function. Includes appending values.
+    // kinda weird best reasoning i found was an issue on the gh repo from like
+    // 3 years ago. apparentlly toml::array arr[i] would level all of mumbai if
+    // the repo owner tried to implement it.. Anyways because bro is lazy we are
+    // lazily looping over this array
+
+    int pinCount = 0;
+    while (pinCount < pin_array->size()) {
+      // look at how they massacred my boy..... shit's almost as ugly as rust
+      // code
+      if ((*pin_array)[pinCount].value<std::string>() == pDir.string()) {
+        // gotta watch out here, indexes can be skipped due to erase() shifting
+        // indices
+        pin_array->erase(pin_array->begin() + pinCount);
+      } else
+        // only move up when not erasing
+        ++pinCount;
+    }
+    ofstream configFile(filePath);
+    if (configFile) {
+      configFile << config_table;
+    }
+  } catch (const toml::parse_error &err) {
+    cout << "deleting pin failed: " << err;
   }
 }
 
