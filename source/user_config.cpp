@@ -112,12 +112,18 @@ void pinDirectory(filesystem::path pDir) {
   try {
     toml::table path_table = toml::parse_file(filePath.string());
 
-    toml::array *path_list = path_table["pinned"].as_array();
-    if (!path_list) {
+    toml::array *pin_list = path_table["pinned"].as_array();
+    if (!pin_list) {
       path_table.insert_or_assign("pinned", toml::array{});
-      path_list = path_table["pinned"].as_array();
+      pin_list = path_table["pinned"].as_array();
     }
-    path_list->push_back(pDir.string());
+    // checking for duplicates
+    for (auto &index : *pin_list) {
+      // Found in pins already. Don't do anything
+      if (index.is_string() && index.value<string>() == pDir.string())
+        return;
+    }
+    pin_list->push_back(pDir.string());
 
     ofstream configFile(filePath);
     if (configFile) {
