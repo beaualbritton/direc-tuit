@@ -36,7 +36,6 @@ Component fileExplorer() {
 
   /*
    TODO: ADD:
-   * -Sidebar with pinned dirs (Home, Desktop, Documents, etc.)
    * -Use existing directory or make new? (new function/popup)
    * -pointerSelect button
    *  Input box for typing
@@ -57,21 +56,7 @@ Component fileExplorer() {
 }
 
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
-  /*
-   TODO:
-   FIX CRASH ON MOUSE EVENT
-   I've boiled it down to this line here,
-   This function works properly with keyboard input. No issues, thoroughly
-   tested. However, the story is much different for mouse clicks. I'm fairly
-   certain the mouse click event is not handled in the same way that buttons
-   are.
-
-   Commenting out DetachAllChildren breaks functionality (stacks explorer
-   frames) but does not crash when mouse is clicked.
-   */
-
   pContainer->DetachAllChildren();
-
   shared_ptr<string> sharedString = make_shared<string>();
   Component currentDirLabel =
       Renderer([pPath] { return text(string(pPath.filename())); });
@@ -111,6 +96,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   getUserPinned(pinnedContainer, pContainer);
 
+  auto *screen = ScreenInteractive::Active();
   Component wrapContainer = Container::Horizontal({});
   for (auto const &entry : std::filesystem::directory_iterator{pPath}) {
     const path iterPath = entry.path();
@@ -118,9 +104,9 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
     *sharedString = label;
     Component fileButton = Button(
         is_directory(iterPath) ? "" : "",
-        [iterPath, pContainer] {
+        [iterPath, pContainer, screen] {
           if (is_directory(iterPath)) {
-            populate(pContainer, iterPath);
+            screen->Post([=] { populate(pContainer, iterPath); });
           }
         },
         ButtonOption::Ascii());
