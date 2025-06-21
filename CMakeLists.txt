@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14.0)
-project(produc-tuity VERSION 0.0.1 LANGUAGES CXX)
+project(dir-tuity VERSION 0.0.1 LANGUAGES CXX)
 
 #c23
 set(CMAKE_CXX_STANDARD 23)
@@ -17,11 +17,11 @@ FetchContent_Declare(tomlplusplus
   GIT_TAG v3.4.0
 )
 FetchContent_MakeAvailable(tomlplusplus)
-add_executable(produc-tuity source/main.cpp
+add_executable(dir-tuit source/main.cpp
 source/window.cpp
 source/user_config.cpp
 source/components/file_explorer.cpp)
-target_link_libraries(produc-tuity
+target_link_libraries(dir-tuit
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
     PRIVATE ftxui::component
