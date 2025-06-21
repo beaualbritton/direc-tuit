@@ -22,6 +22,7 @@ public:
   void run();
   void setWindow(Component);
   Component getWindow();
+  ScreenInteractive &getScreen();
 
 private:
   // c++ singleton time
