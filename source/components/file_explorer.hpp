@@ -4,7 +4,6 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
-
 // Returns navigable terminal-based file explorer
 Component fileExplorer();
 void populate(std::shared_ptr<ComponentBase> pContainer,

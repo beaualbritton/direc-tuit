@@ -1,5 +1,6 @@
 #include "file_explorer.hpp"
 #include "../user_config.hpp"
+#include "../window.hpp"
 #include <filesystem>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
@@ -106,7 +107,8 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         is_directory(iterPath) ? "" : "",
         [iterPath, pContainer, screen] {
           if (is_directory(iterPath)) {
-            screen->Post([=] { populate(pContainer, iterPath); });
+            WindowRender::instance().getScreen().Post(
+                [=] { populate(pContainer, iterPath); });
           }
         },
         ButtonOption::Ascii());
@@ -153,17 +155,17 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   // Submits current directory to .config for prefered directory to store info.
 
   // Get current screen
-  auto *activeScreen = ScreenInteractive::Active();
 
   // Quits current operation (q behavior)
   cancelButton =
-      Button("Cancel.", activeScreen->ExitLoopClosure(), ButtonOption::Ascii());
+      Button("Cancel.", WindowRender::instance().getScreen().ExitLoopClosure(),
+             ButtonOption::Ascii());
 
   submitButton = Button(
       "Submit.",
       [=] {
         setPreferredPath(pPath);
-        activeScreen->ExitLoopClosure()();
+        WindowRender::instance().getScreen().ExitLoopClosure()();
       },
       ButtonOption::Ascii());
   submitContainer->Add(submitButton);
