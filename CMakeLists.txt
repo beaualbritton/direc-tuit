@@ -19,7 +19,6 @@ FetchContent_Declare(tomlplusplus
 FetchContent_MakeAvailable(tomlplusplus)
 add_executable(produc-tuity source/main.cpp
 source/window.cpp
-source/dialogue_window.cpp
 source/user_config.cpp
 source/components/file_explorer.cpp)
 target_link_libraries(produc-tuity
