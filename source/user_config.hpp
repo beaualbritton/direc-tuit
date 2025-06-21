@@ -1,13 +1,7 @@
 #include <filesystem>
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/component_base.hpp>
-#include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/elements.hpp>
-using namespace ftxui;
+#include <vector>
 using std::string, std::shared_ptr, std::make_shared;
 
-// returns t/f based on if there is an initialized .produc-tuity directory in
-// this repo
 bool checkConfig();
 
 // initializes .produc-tuity directory with empty userconfig file

@@ -1,9 +1,4 @@
 #include "user_config.hpp"
-#include <algorithm>
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/component_base.hpp>
-#include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/elements.hpp>
 // incoming c++ dub
 #include <filesystem>
 
@@ -12,8 +7,6 @@
 #include <toml++/impl/parse_error.hpp>
 #include <toml++/impl/parser.hpp>
 #include <toml++/toml.hpp>
-
-using namespace ftxui;
 using namespace std;
 // using std::string;
 // using std::filesystem::create_directory; using std::filesystem::exists;
