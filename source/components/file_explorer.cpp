@@ -1,6 +1,7 @@
 #include "file_explorer.hpp"
 #include "../user_config.hpp"
 #include "../window.hpp"
+#include "popup.hpp"
 #include <filesystem>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
@@ -21,6 +22,7 @@ const int TERM_WIDTH = terminalSize.dimx;
 const int TERM_HEIGHT = terminalSize.dimy;
 const int EXPLORER_WIDTH = TERM_WIDTH * 0.85;
 const int EXPLORER_HEIGHT = TERM_HEIGHT * 0.75;
+shared_ptr<bool> modalBool;
 
 Component fileExplorer() {
   path currentPath = std::filesystem::current_path();
@@ -53,7 +55,11 @@ Component fileExplorer() {
                   })) |
            center | vcenter;
   });
-  return explorer;
+  modalBool = make_shared<bool>(false);
+  string text = "text";
+  Component wrappedExplorer =
+      explorer | Modal(horizontalPopup(text, modalBool.get()), modalBool.get());
+  return wrappedExplorer;
 }
 
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
@@ -117,6 +123,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         pinDirectory(iterPath);
         pinnedContainer->DetachAllChildren();
         getUserPinned(pinnedContainer, pContainer);
+        *modalBool = true;
         return true;
       }
       return false;
