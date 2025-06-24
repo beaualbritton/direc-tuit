@@ -6,10 +6,10 @@
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
 
-Component horizontalPopup(std::string message, bool *modalFlag) {
+Component horizontalPopup(std::string message, bool *modalFlag,
+                          std::function<void()> onConfirm) {
   Component confirmButton, cancelButton;
-  confirmButton = Button(
-      "[Y]es", [modalFlag] { *modalFlag = false; }, ButtonOption::Ascii());
+  confirmButton = Button("[Y]es", onConfirm, ButtonOption::Ascii());
   cancelButton = Button(
       "[N]o", [modalFlag] { *modalFlag = false; }, ButtonOption::Ascii());
   Component popupBody = Container::Horizontal({confirmButton, cancelButton});

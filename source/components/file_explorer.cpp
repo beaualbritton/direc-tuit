@@ -23,8 +23,13 @@ const int TERM_HEIGHT = terminalSize.dimy;
 const int EXPLORER_WIDTH = TERM_WIDTH * 0.85;
 const int EXPLORER_HEIGHT = TERM_HEIGHT * 0.75;
 shared_ptr<bool> modalBool;
+Component popupContainer;
+shared_ptr<Component> currentPopupContent;
 
 Component fileExplorer() {
+  modalBool = make_shared<bool>(false);
+  currentPopupContent = make_shared<Component>();
+  popupContainer = Container::Horizontal({});
   path currentPath = std::filesystem::current_path();
   // Get current directory and sub-directories & files
   // container for fileButtons
@@ -55,11 +60,15 @@ Component fileExplorer() {
                   })) |
            center | vcenter;
   });
-  modalBool = make_shared<bool>(false);
-  string text = "text";
-  Component wrappedExplorer =
-      explorer | Modal(horizontalPopup(text, modalBool.get()), modalBool.get());
-  return wrappedExplorer;
+  currentPopupContent = make_shared<Component>();
+  *currentPopupContent =
+      Renderer([=] { return text("nil"); }); // Empty initially
+
+  // Create the popup that will render the current popup content
+  popupContainer->Add(*currentPopupContent);
+  // Store the popup content pointer globally so it can be updated
+
+  return Modal(popupContainer, modalBool.get())(explorer);
 }
 
 void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
@@ -118,11 +127,21 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
           }
         },
         ButtonOption::Ascii());
+
     Component catchFileEvents = CatchEvent(fileButton, [=](Event event) {
-      if (event == Event::Character('p')) { /*call pinned dir */
-        pinDirectory(iterPath);
-        pinnedContainer->DetachAllChildren();
-        getUserPinned(pinnedContainer, pContainer);
+      if (event == Event::Character('p')) {
+        // Build the new popup
+        auto popupLambda = [=] {
+          pinDirectory(iterPath);
+          pinnedContainer->DetachAllChildren();
+          getUserPinned(pinnedContainer, pContainer);
+          *modalBool = false;
+        };
+        popupContainer->DetachAllChildren();
+        *currentPopupContent =
+            horizontalPopup("Pin directory: ", modalBool.get(), popupLambda);
+        popupContainer->Add(*currentPopupContent);
+        // Open the modal
         *modalBool = true;
         return true;
       }
@@ -192,8 +211,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
 */
 void getUserPinned(Component pContainer, Component fileContainer) {
-  // TODO: fetch info from .config
-  //
+
   Component globalContainer = Container::Vertical({});
   Component recentContainer = Container::Vertical({});
   path hDir = homeDir();
@@ -204,10 +222,6 @@ void getUserPinned(Component pContainer, Component fileContainer) {
 
   std::vector<path> pinnedDirs = getPinnedDirs();
 
-  /*
-   TODO:
-   delete pins w/user_config & catch event wrapper
-    */
   globalContainer->Add(homeButton);
   for (path p : pinnedDirs) {
     Component currentPinButton = Button(

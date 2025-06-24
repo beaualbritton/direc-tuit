@@ -5,5 +5,6 @@
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
 
-Component horizontalPopup(std::string msg, bool *modalFlag);
+Component horizontalPopup(std::string msg, bool *modalFlag,
+                          std::function<void()> onConfirm);
 Component verticalPopUp();
