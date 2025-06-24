@@ -129,7 +129,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         ButtonOption::Ascii());
 
     Component catchFileEvents = CatchEvent(fileButton, [=](Event event) {
-      if (event == Event::Character('p')) {
+      if (event == Event::Character('p') && is_directory(iterPath)) {
         // Build the new popup
         auto popupLambda = [=] {
           pinDirectory(iterPath);
@@ -139,7 +139,8 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         };
         popupContainer->DetachAllChildren();
         *currentPopupContent =
-            horizontalPopup("Pin directory: ", modalBool.get(), popupLambda);
+            horizontalPopup("Pin directory: " + iterPath.filename().string(),
+                            modalBool.get(), popupLambda);
         popupContainer->Add(*currentPopupContent);
         // Open the modal
         *modalBool = true;
@@ -174,7 +175,6 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   pContainer->Add(Renderer([] { return separator(); }));
 
-  // TODO: add submit bar
   Component submitContainer = Container::Horizontal({});
 
   Component submitButton, cancelButton;
@@ -230,9 +230,20 @@ void getUserPinned(Component pContainer, Component fileContainer) {
         ButtonOption::Ascii());
     Component buttonWrapper = CatchEvent(currentPinButton, [=](Event event) {
       if (event == Event::Character('d')) { /*call pinned dir */
-        deletePin(p);
-        pContainer->DetachAllChildren();
-        getUserPinned(pContainer, fileContainer);
+        auto popupLambda = [=] {
+          deletePin(p);
+          pContainer->DetachAllChildren();
+          getUserPinned(pContainer, fileContainer);
+          *modalBool = false;
+        };
+        popupContainer->DetachAllChildren();
+        *currentPopupContent =
+            horizontalPopup("Delete pin: " + p.filename().string(),
+                            modalBool.get(), popupLambda);
+        popupContainer->Add(*currentPopupContent);
+        // Open the modal
+        *modalBool = true;
+
         return true;
       }
       return false;
