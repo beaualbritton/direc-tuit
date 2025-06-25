@@ -75,7 +75,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   pContainer->DetachAllChildren();
   shared_ptr<string> sharedString = make_shared<string>();
   Component currentDirLabel =
-      Renderer([pPath] { return text(string(pPath.filename())); });
+      Renderer([pPath] { return text((pPath.filename().string())); });
 
   int wrapCount = 0;
 
@@ -148,7 +148,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
       }
       return false;
     });
-    string textString = string(iterPath.filename());
+    string textString = (iterPath.filename().string());
     Component buttonText = Renderer([textString, iterPath] {
       return text(iterPath.empty() ? "Empty " : textString) |
              size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.825) - 4) / 5);
@@ -216,7 +216,7 @@ void getUserPinned(Component pContainer, Component fileContainer) {
   Component recentContainer = Container::Vertical({});
   path hDir = homeDir();
   Component homeButton = Button(
-      ": " + string(hDir.filename()),
+      ": " + (hDir.filename().string()),
       [hDir, fileContainer] { populate(fileContainer, hDir); },
       ButtonOption::Ascii());
 

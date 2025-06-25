@@ -90,7 +90,7 @@ void setPreferredPath(filesystem::path pPath) {
   try {
     toml::table path_table = toml::parse_file(filePath.string());
 
-    path_table.insert_or_assign("path", string(pPath));
+    path_table.insert_or_assign("path", (pPath.string()));
     ofstream configFile(filePath);
     if (configFile) {
       configFile << path_table;
