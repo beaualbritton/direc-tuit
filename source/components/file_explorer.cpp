@@ -146,6 +146,13 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         *modalBool = true;
         return true;
       }
+      if (event == Event::Character('o')) {
+        popupContainer->DetachAllChildren();
+        *currentPopupContent = fileOptionPopUp(modalBool.get(), iterPath);
+        popupContainer->Add(*currentPopupContent);
+        *modalBool = true;
+        return true;
+      }
       return false;
     });
     string textString = (iterPath.filename().string());

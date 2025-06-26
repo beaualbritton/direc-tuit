@@ -1,3 +1,4 @@
+#include "../foperation.hpp"
 #include <filesystem>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
@@ -19,5 +20,29 @@ Component horizontalPopup(std::string message, bool *modalFlag,
            border | center;
   });
 
+  return popup;
+}
+Component fileOptionPopUp(bool *modalFlag, std::filesystem::path pPath) {
+  // Originally was going to using ftxui::Menu but it has limited support for
+  // onEnter events
+
+  // TODO: These should have corresponding keybinds in filexplorer
+  Component openButton, openWithButton, previewButton,
+      deleteButton; /*TODO: more button options. viewInfo, rename, copy,
+                       paste,*/
+
+  deleteButton = Button(
+      "[D]elete",
+      [modalFlag, pPath] {
+        *modalFlag = false;
+        deletePath(pPath);
+      },
+      ButtonOption::Ascii());
+  Component optionContainer = Container::Vertical({deleteButton});
+  Component popup = Renderer(optionContainer, [pPath, optionContainer] {
+    return window(text(pPath.filename().string()), optionContainer->Render()) |
+           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
+           center;
+  });
   return popup;
 }
