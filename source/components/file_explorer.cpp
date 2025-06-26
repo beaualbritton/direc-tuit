@@ -1,4 +1,5 @@
 #include "file_explorer.hpp"
+#include "../foperation.hpp"
 #include "../user_config.hpp"
 #include "../window.hpp"
 #include "popup.hpp"
@@ -147,8 +148,17 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         return true;
       }
       if (event == Event::Character('o')) {
+        auto refreshLambda = [=] {
+          bool deleted = deletePath(iterPath);
+          if (deleted) {
+            WindowRender::instance().getScreen().Post(
+                [=] { populate(pContainer, iterPath.parent_path()); });
+            *modalBool = false;
+          }
+        };
         popupContainer->DetachAllChildren();
-        *currentPopupContent = fileOptionPopUp(modalBool.get(), iterPath);
+        *currentPopupContent =
+            fileOptionPopUp(modalBool.get(), iterPath, refreshLambda);
         popupContainer->Add(*currentPopupContent);
         *modalBool = true;
         return true;

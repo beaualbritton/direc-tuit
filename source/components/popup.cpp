@@ -22,7 +22,8 @@ Component horizontalPopup(std::string message, bool *modalFlag,
 
   return popup;
 }
-Component fileOptionPopUp(bool *modalFlag, std::filesystem::path pPath) {
+Component fileOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
+                          std::function<void()> refresh) {
   // Originally was going to using ftxui::Menu but it has limited support for
   // onEnter events
 
@@ -31,13 +32,7 @@ Component fileOptionPopUp(bool *modalFlag, std::filesystem::path pPath) {
       deleteButton; /*TODO: more button options. viewInfo, rename, copy,
                        paste,*/
 
-  deleteButton = Button(
-      "[D]elete",
-      [modalFlag, pPath] {
-        *modalFlag = false;
-        deletePath(pPath);
-      },
-      ButtonOption::Ascii());
+  deleteButton = Button("[D]elete", refresh, ButtonOption::Ascii());
   Component optionContainer = Container::Vertical({deleteButton});
   Component popup = Renderer(optionContainer, [pPath, optionContainer] {
     return window(text(pPath.filename().string()), optionContainer->Render()) |
