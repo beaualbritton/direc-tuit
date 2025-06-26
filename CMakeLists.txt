@@ -20,6 +20,7 @@ FetchContent_MakeAvailable(tomlplusplus)
 add_executable(dir-tuit source/main.cpp
 source/window.cpp
 source/user_config.cpp
+source/foperation.cpp
 source/components/file_explorer.cpp
 source/components/popup.cpp)
 target_link_libraries(dir-tuit
