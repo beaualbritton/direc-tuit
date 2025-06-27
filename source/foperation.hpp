@@ -5,3 +5,5 @@ using std::string, std::shared_ptr, std::make_shared;
 bool deletePath(std::filesystem::path pPath);
 
 void renamePath(std::filesystem::path pPath, string renameString);
+// Helper function for rename functionality
+std::string getExtension(std::filesystem::path pPath);

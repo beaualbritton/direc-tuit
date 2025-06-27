@@ -40,19 +40,19 @@ Component deleteOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
                             std::shared_ptr<std::string> renameString,
                             std::function<void()> refresh) {
-  Component renameInput, renameConfirm, renameCancel;
+  Component renameInput, extensionText, renameConfirm, renameCancel;
 
   shared_ptr<string> titleString =
       make_shared<string>("[R]enaming: " + pPath.filename().string());
   InputOption renameInputOpts = InputOption();
   renameInputOpts.multiline = false;
   renameInputOpts.on_enter = [=] {
-    *titleString =
-        "[R]ename " + pPath.filename().string() + " to: " + *renameString + "?";
+    *titleString = "[R]ename " + pPath.filename().string() +
+                   " to: " + *renameString + getExtension(pPath) + "?";
   };
 
   renameInput = Input(renameString.get(), "filename", renameInputOpts);
-
+  extensionText = Renderer([pPath] { return text(getExtension(pPath)); });
   renameConfirm = Button("[Y]es", refresh, ButtonOption::Ascii());
   renameCancel = Button(
       "[N]o", [modalFlag] { *modalFlag = false; }, ButtonOption::Ascii());
@@ -60,10 +60,12 @@ Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
   Component buttonContainer =
       Container::Horizontal({renameConfirm, renameCancel});
   Component renameContainer =
-      Container::Vertical({renameInput, buttonContainer});
+      Container::Horizontal({renameInput, extensionText});
+  Component bodyContainer =
+      Container::Vertical({renameContainer, buttonContainer});
 
-  Component popup = Renderer(renameContainer, [titleString, renameContainer] {
-    return window(text(*titleString), renameContainer->Render()) |
+  Component popup = Renderer(bodyContainer, [titleString, bodyContainer] {
+    return window(text(*titleString), bodyContainer->Render()) |
            size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
            center;
   });

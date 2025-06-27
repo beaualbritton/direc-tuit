@@ -25,8 +25,20 @@ void renamePath(std::filesystem::path pPath, string renameString) {
   if (pPath.has_parent_path())
     parentPath = pPath.parent_path();
   // std::filesystem syntax '/' joins string to filename
-  fs::rename(pPath, parentPath / renameString);
+  fs::rename(pPath, parentPath / (renameString + getExtension(pPath)));
 
   // TODO: add some handling so that directories cant be renamed with file
   // extensions & vice versa
+}
+
+std::string getExtension(std::filesystem::path pPath) {
+  std::string returnString, pathString;
+  // Checking if directory
+  if (fs::is_directory(pPath)) {
+    return "/";
+  }
+  // File extension
+  pathString = pPath.extension().string();
+  // TODO: perhaps more robust checking for hidden files like .bashrc
+  return pathString;
 }
