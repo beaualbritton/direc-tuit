@@ -10,3 +10,6 @@ Component horizontalPopup(std::string msg, bool *modalFlag,
 Component verticalPopUp();
 Component deleteOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
                             std::function<void()> refresh);
+Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
+                            std::shared_ptr<std::string> renameString,
+                            std::function<void()> refresh);

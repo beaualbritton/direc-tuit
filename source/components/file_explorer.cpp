@@ -161,6 +161,22 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         *modalBool = true;
         return true;
       }
+      // Rename behavior
+      if (event == Event::Character('r')) {
+        shared_ptr<string> renameString = make_shared<string>();
+        auto renameLambda = [=] {
+          renamePath(iterPath, *renameString);
+          WindowRender::instance().getScreen().Post(
+              [=] { populate(pContainer, iterPath.parent_path()); });
+          *modalBool = false;
+        };
+        popupContainer->DetachAllChildren();
+        *currentPopupContent = renameOptionPopUp(modalBool.get(), iterPath,
+                                                 renameString, renameLambda);
+        popupContainer->Add(*currentPopupContent);
+        *modalBool = true;
+        return true;
+      }
       return false;
     });
     string textString = (iterPath.filename().string());

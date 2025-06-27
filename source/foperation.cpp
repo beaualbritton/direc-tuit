@@ -18,3 +18,15 @@ bool deletePath(std::filesystem::path pPath) {
     return fs::remove(pPath);
   }
 }
+
+void renamePath(std::filesystem::path pPath, string renameString) {
+  // Retrieve parent directory for filesysystem::rename
+  fs::path parentPath;
+  if (pPath.has_parent_path())
+    parentPath = pPath.parent_path();
+  // std::filesystem syntax '/' joins string to filename
+  fs::rename(pPath, parentPath / renameString);
+
+  // TODO: add some handling so that directories cant be renamed with file
+  // extensions & vice versa
+}
