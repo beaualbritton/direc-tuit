@@ -246,8 +246,10 @@ void getUserPinned(Component pContainer, Component fileContainer) {
   path hDir = homeDir();
   Component homeButton = Button(
       ": " + (hDir.filename().string()),
-      // TODO: fix mouse button crash (wait for WindowRender::screen to post)
-      [hDir, fileContainer] { populate(fileContainer, hDir); },
+      [hDir, fileContainer] {
+        WindowRender::instance().getScreen().Post(
+            [=] { populate(fileContainer, hDir); });
+      },
       ButtonOption::Ascii());
 
   std::vector<path> pinnedDirs = getPinnedDirs();
@@ -256,7 +258,10 @@ void getUserPinned(Component pContainer, Component fileContainer) {
   for (path p : pinnedDirs) {
     Component currentPinButton = Button(
         ": " + p.filename().string(),
-        [p, fileContainer] { populate(fileContainer, p); },
+        [p, fileContainer] {
+          WindowRender::instance().getScreen().Post(
+              [=] { populate(fileContainer, p); });
+        },
         ButtonOption::Ascii());
     Component buttonWrapper = CatchEvent(currentPinButton, [=](Event event) {
       // Delete *Pinned* behavior
