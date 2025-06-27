@@ -45,9 +45,6 @@ Component fileExplorer() {
 
   /*
    TODO: ADD:
-   * -Use existing directory or make new? (new function/popup)
-   * -pointerSelect button
-   *  Input box for typing
    *  Keybinds for file operations (create, delete, open.)
    *  Some more robust error handling (if directory shit is weird)
    */
@@ -67,8 +64,8 @@ Component fileExplorer() {
 
   // Create the popup that will render the current popup content
   popupContainer->Add(*currentPopupContent);
-  // Store the popup content pointer globally so it can be updated
 
+  // Store the popup content pointer globally so it can be updated
   return Modal(popupContainer, modalBool.get())(explorer);
 }
 
@@ -97,7 +94,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   Component horizontalContainer = Container::Horizontal({});
   Component pinnedContainer = Container::Vertical({});
-  int scrollVal = 0;
+
   Component bodyContainer = Container::Vertical({});
 
   horizontalContainer->Add(Renderer(pinnedContainer, [pinnedContainer] {
@@ -130,8 +127,8 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         ButtonOption::Ascii());
 
     Component catchFileEvents = CatchEvent(fileButton, [=](Event event) {
+      // Pin behavior
       if (event == Event::Character('p') && is_directory(iterPath)) {
-        // Build the new popup
         auto popupLambda = [=] {
           pinDirectory(iterPath);
           pinnedContainer->DetachAllChildren();
@@ -143,11 +140,12 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
             horizontalPopup("Pin directory: " + iterPath.filename().string(),
                             modalBool.get(), popupLambda);
         popupContainer->Add(*currentPopupContent);
-        // Open the modal
+        // Open the modal (ftxui popup)
         *modalBool = true;
         return true;
       }
-      if (event == Event::Character('o')) {
+      // Delete behavior
+      if (event == Event::Character('d')) {
         auto refreshLambda = [=] {
           bool deleted = deletePath(iterPath);
           if (deleted) {
@@ -158,7 +156,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         };
         popupContainer->DetachAllChildren();
         *currentPopupContent =
-            fileOptionPopUp(modalBool.get(), iterPath, refreshLambda);
+            deleteOptionPopUp(modalBool.get(), iterPath, refreshLambda);
         popupContainer->Add(*currentPopupContent);
         *modalBool = true;
         return true;
@@ -197,8 +195,6 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   Component submitButton, cancelButton;
   // Submits current directory to .config for prefered directory to store info.
 
-  // Get current screen
-
   // Quits current operation (q behavior)
   cancelButton =
       Button("Cancel.", WindowRender::instance().getScreen().ExitLoopClosure(),
@@ -234,6 +230,7 @@ void getUserPinned(Component pContainer, Component fileContainer) {
   path hDir = homeDir();
   Component homeButton = Button(
       ": " + (hDir.filename().string()),
+      // TODO: fix mouse button crash (wait for WindowRender::screen to post)
       [hDir, fileContainer] { populate(fileContainer, hDir); },
       ButtonOption::Ascii());
 
@@ -246,6 +243,7 @@ void getUserPinned(Component pContainer, Component fileContainer) {
         [p, fileContainer] { populate(fileContainer, p); },
         ButtonOption::Ascii());
     Component buttonWrapper = CatchEvent(currentPinButton, [=](Event event) {
+      // Delete *Pinned* behavior
       if (event == Event::Character('d')) { /*call pinned dir */
         auto popupLambda = [=] {
           deletePin(p);
@@ -258,7 +256,6 @@ void getUserPinned(Component pContainer, Component fileContainer) {
             horizontalPopup("Delete pin: " + p.filename().string(),
                             modalBool.get(), popupLambda);
         popupContainer->Add(*currentPopupContent);
-        // Open the modal
         *modalBool = true;
 
         return true;
@@ -273,6 +270,8 @@ void getUserPinned(Component pContainer, Component fileContainer) {
   pContainer->Add(globalContainer);
   pContainer->Add(recentContainer);
 }
+// TODO: test this a little more -- sometimes causes issues on my Windows
+// machine
 path homeDir() {
 #ifdef _WIN32
   return std::getenv("USERPROFILE");

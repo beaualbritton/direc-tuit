@@ -8,5 +8,5 @@ using namespace ftxui;
 Component horizontalPopup(std::string msg, bool *modalFlag,
                           std::function<void()> onConfirm);
 Component verticalPopUp();
-Component fileOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
-                          std::function<void()> refresh);
+Component deleteOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
+                            std::function<void()> refresh);
