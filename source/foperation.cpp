@@ -1,5 +1,6 @@
 #include "foperation.hpp"
 #include <filesystem>
+#include <fstream>
 
 namespace fs = std::filesystem;
 
@@ -41,4 +42,16 @@ std::string getExtension(std::filesystem::path pPath) {
   pathString = pPath.extension().string();
   // TODO: perhaps more robust checking for hidden files like .bashrc
   return pathString;
+}
+
+void createFile(std::filesystem::path parentPath, std::string fileName,
+                bool dirFlag) {
+  // Flagging directory from parameters for separation of logic. Directories use
+  // filesystem::create_directory. Files use standard ofstream
+  if (dirFlag)
+    fs::create_directory(parentPath / fileName);
+  else {
+    std::ofstream outFile(parentPath / fileName);
+    outFile.close();
+  }
 }

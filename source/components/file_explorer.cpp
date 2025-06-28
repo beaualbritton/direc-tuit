@@ -97,12 +97,33 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
   Component bodyContainer = Container::Vertical({});
 
+  Component bodyContainerEvents = CatchEvent(bodyContainer, [=](Event event) {
+    if (event == Event::Character('n')) {
+      // Create behavior (for focused path)
+      shared_ptr<string> newFileString = make_shared<string>();
+      shared_ptr<bool> dirFlag = make_shared<bool>();
+      auto createLambda = [=] {
+        createFile(pPath, *newFileString, *dirFlag);
+        WindowRender::instance().getScreen().Post(
+            [=] { populate(pContainer, pPath); });
+        *modalBool = false;
+      };
+      popupContainer->DetachAllChildren();
+      *currentPopupContent = newOptionPopUp(
+          modalBool.get(), pPath, newFileString, createLambda, dirFlag.get());
+      popupContainer->Add(*currentPopupContent);
+      *modalBool = true;
+      return true;
+    }
+    return false;
+  });
+
   horizontalContainer->Add(Renderer(pinnedContainer, [pinnedContainer] {
     return pinnedContainer->Render() |
            size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.1875);
   }));
   horizontalContainer->Add(Renderer([] { return separator(); }));
-  horizontalContainer->Add(Renderer(bodyContainer, [bodyContainer] {
+  horizontalContainer->Add(Renderer(bodyContainerEvents, [bodyContainer] {
     return bodyContainer->Render() |
            size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.825) |
            size(HEIGHT, EQUAL, EXPLORER_HEIGHT) | frame | vscroll_indicator;

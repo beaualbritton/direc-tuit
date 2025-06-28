@@ -72,6 +72,42 @@ Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
   return popup;
 }
 
+Component newOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
+                         std::shared_ptr<std::string> fileName,
+                         std::function<void()> refresh, bool *dirFlag) {
+
+  Component fileNameInput, fileConfirm, fileCancel;
+  shared_ptr<string> titleString = make_shared<string>("[N]ew file.");
+
+  InputOption fileInputOpts = InputOption();
+  fileInputOpts.multiline = false;
+  fileInputOpts.on_enter = [=] {
+    *titleString = "[N]ew file. Create:  " + *fileName + "?";
+    // not a directory
+    if (!(pPath / *fileName).extension().empty()) {
+      *dirFlag = false;
+    } else {
+      *dirFlag = true;
+    }
+  };
+
+  fileNameInput = Input(fileName.get(), "filename", fileInputOpts);
+  fileConfirm = Button("[Y]es", refresh, ButtonOption::Ascii());
+  fileCancel = Button(
+      "[N]o", [modalFlag] { *modalFlag = false; }, ButtonOption::Ascii());
+
+  Component buttonContainer = Container::Horizontal({fileConfirm, fileCancel});
+  Component bodyContainer =
+      Container::Vertical({fileNameInput, buttonContainer});
+
+  Component popup = Renderer(bodyContainer, [titleString, bodyContainer] {
+    return window(text(*titleString), bodyContainer->Render()) |
+           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
+           center;
+  });
+  return popup;
+}
+
 /* TODO: These should have corresponding keybinds in filexplorer
   Component openButton, openWithButton, previewButton,
    TODO: more button options. viewInfo, rename, copy, paste,
