@@ -203,3 +203,26 @@ void copyToConfig(std::filesystem::path copyFile) {
     cout << "copying file failed:" << err;
   }
 }
+
+// Don't be fooled! This is for pasting functionality
+std::filesystem::path getCopiedPath() {
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    // Using auto because toml::node* is tricky. compiler save me
+    auto pathValue = config_table["current_copy"];
+    if (!pathValue) {
+      // Throwing an error at *this* line. don't want to return anything except
+      // a valid path, so throw an error to be caught
+      throw toml::parse_error("missing copy file",
+                              toml::source_position{219, 0});
+    }
+    if (pathValue.is_string()) {
+      // Parsing right type
+      std::string pathString = pathValue.as_string()->get();
+      return std::filesystem::path(pathString);
+    }
+
+  } catch (const toml::parse_error &err) {
+    cout << "retrieving copied file failed:" << err;
+  }
+}

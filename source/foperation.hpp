@@ -14,3 +14,5 @@ void createFile(std::filesystem::path parentPath, std::string fileName,
 // copy in .config Why? Allows pasting outside multiple sessions. I plan to
 // include 'clip-board' functionality
 void copyFile(std::filesystem::path copyPath);
+
+void pasteFile(std::filesystem::path parentPath);

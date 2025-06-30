@@ -62,3 +62,23 @@ void copyFile(std::filesystem::path copyPath) {
   // TODO: sanitize/validate a little here
   copyToConfig(copyPath);
 }
+
+void pasteFile(std::filesystem::path parentDir) {
+  // get current copy path
+  fs::path currentCopyPath = getCopiedPath();
+
+  // Evaluate path for copy options (vanilla for files, recursive for dirs, so
+  // subdirectories are also copied)
+  //
+  if (fs::is_directory(currentCopyPath)) {
+    // See https://en.cppreference.com/w/cpp/filesystem/copy.html if this is
+    // confusing
+    fs::copy(currentCopyPath, parentDir / currentCopyPath.filename(),
+             fs::copy_options::recursive);
+  }
+  // Otherwise a file. Default is overwite. TODO: if this fucks anything up
+  // change it
+  else {
+    fs::copy(currentCopyPath, parentDir, fs::copy_options::overwrite_existing);
+  }
+}

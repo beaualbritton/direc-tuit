@@ -116,6 +116,12 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
       *modalBool = true;
       return true;
     }
+    if (event == Event::Character('p')) {
+      pasteFile(pPath);
+      WindowRender::instance().getScreen().Post(
+          [=] { populate(pContainer, pPath); });
+      return true;
+    }
     return false;
   });
 
@@ -150,7 +156,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
     Component catchFileEvents = CatchEvent(fileButton, [=](Event event) {
       // Pin behavior
-      if (event == Event::Character('p') && is_directory(iterPath)) {
+      if (event == Event::Character('f') && is_directory(iterPath)) {
         auto popupLambda = [=] {
           pinDirectory(iterPath);
           pinnedContainer->DetachAllChildren();
@@ -205,6 +211,8 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         copyFile(iterPath);
         return true;
       }
+      // Paste recent yank
+
       return false;
     });
     string textString = (iterPath.filename().string());
