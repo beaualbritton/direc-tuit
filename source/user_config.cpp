@@ -189,3 +189,17 @@ vector<filesystem::path> getPinnedDirs() {
   }
   return pinDirVector;
 }
+
+void copyToConfig(std::filesystem::path copyFile) {
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    config_table.insert_or_assign("current_copy", copyFile.string());
+    ofstream configFile(filePath);
+    if (configFile) {
+      configFile << config_table;
+    }
+
+  } catch (const toml::parse_error &err) {
+    cout << "copying file failed:" << err;
+  }
+}

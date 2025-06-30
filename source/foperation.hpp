@@ -10,3 +10,7 @@ std::string getExtension(std::filesystem::path pPath);
 
 void createFile(std::filesystem::path parentPath, std::string fileName,
                 bool dirFlag);
+// Copy file. This does not call filesystem::copy. Instead, it flags a file to
+// copy in .config Why? Allows pasting outside multiple sessions. I plan to
+// include 'clip-board' functionality
+void copyFile(std::filesystem::path copyPath);

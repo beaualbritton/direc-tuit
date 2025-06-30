@@ -1,4 +1,5 @@
 #include "foperation.hpp"
+#include "user_config.hpp"
 #include <filesystem>
 #include <fstream>
 
@@ -54,4 +55,10 @@ void createFile(std::filesystem::path parentPath, std::string fileName,
     std::ofstream outFile(parentPath / fileName);
     outFile.close();
   }
+}
+
+void copyFile(std::filesystem::path copyPath) {
+  // call user-config
+  // TODO: sanitize/validate a little here
+  copyToConfig(copyPath);
 }

@@ -18,3 +18,7 @@ void setPreferredPath(std::filesystem::path pPath);
 void pinDirectory(std::filesystem::path pDir);
 std::vector<std::filesystem::path> getPinnedDirs();
 void deletePin(std::filesystem::path pDir);
+
+// Copies to .config/userconfig.toml
+void copyToConfig(std::filesystem::path copyFile);
+std::filesystem::path getCopiedPath();

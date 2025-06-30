@@ -7,6 +7,7 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/component_options.hpp>
+#include <ftxui/component/event.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
@@ -196,6 +197,12 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
                                                  renameString, renameLambda);
         popupContainer->Add(*currentPopupContent);
         *modalBool = true;
+        return true;
+      }
+
+      // Copy/yank behavior
+      if (event == Event::Character('y')) {
+        copyFile(iterPath);
         return true;
       }
       return false;
