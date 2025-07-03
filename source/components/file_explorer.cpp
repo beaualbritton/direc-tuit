@@ -241,6 +241,16 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
   pContainer->Add(horizontalContainer);
 
   pContainer->Add(Renderer([] { return separator(); }));
+  // Check if bodyContainer is empty
+  if (bodyContainer->ChildCount() <= 0) {
+    // add invisible field for focusing
+    // FTXUI doesn't catch events on empty containers. Need to find a way around
+    // that
+    bodyContainer->Add(Button(
+        "empty directory! [N] is your friend.",
+        [] { /*Empty lambda. This is just a placeholder for problem above*/ },
+        ButtonOption::Ascii()));
+  }
 
   Component submitContainer = Container::Horizontal({});
 
