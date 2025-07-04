@@ -92,20 +92,24 @@ std::string getPermissionString(std::filesystem::path pPath) {
   // https://en.cppreference.com/w/cpp/filesystem/perms.html
   //
   fs::file_status pPathStatus;
-  string str = "";
+  string permissionString = "";
 
   // Thank you cpp doc dwelling lambda wizards for this one
   // See docs above. Just wanna make this more explicit
   std::function<void(char, fs::perms)> addPermission =
-      [pPath, &str](char op, fs::perms perm) {
-        // I lied. Gotta use permissions for proper bit mask with &
-        str +=
-            ((perm & fs::status(pPath).permissions()) == fs::perms::none ? '-'
-                                                                         : op);
+      [pPath, &permissionString](char op, fs::perms perm) {
+	// I lied. Gotta use permissions for proper bit mask with &
+	permissionString +=
+	    ((perm & fs::status(pPath).permissions()) == fs::perms::none ? '-'
+									 : op);
       };
 #ifdef _WIN32
   addPermission('r', fs::perms::owner_read);
   addPermission('w', fs::perms::owner_write);
+  addPermission('x', fs::perms::owner_exec);
+  // Every other perm on windows doesnt exist
+  for (int i = 0; i < 6; ++i)
+    permissionString += '-';
 #else
   addPermission('r', fs::perms::owner_read);
   addPermission('w', fs::perms::owner_write);
@@ -119,5 +123,5 @@ std::string getPermissionString(std::filesystem::path pPath) {
 
 #endif // _WIN32
 
-  return str;
+  return permissionString;
 }
