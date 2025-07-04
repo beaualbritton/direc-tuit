@@ -2,6 +2,8 @@
 #include "user_config.hpp"
 #include <filesystem>
 #include <fstream>
+#include <functional>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -81,4 +83,41 @@ void pasteFile(std::filesystem::path parentDir) {
   else {
     fs::copy(currentCopyPath, parentDir, fs::copy_options::overwrite_existing);
   }
+}
+std::string getPermissionString(std::filesystem::path pPath) {
+
+  // This is a bit tricky. Windows 'Philosophy' doesn't support permissions for
+  // 'groups' or 'others'. Need to only add owner info in this case. Not using
+  // fs::permissions for this reason. Instead, getting manually.
+  // https://en.cppreference.com/w/cpp/filesystem/perms.html
+  //
+  fs::file_status pPathStatus;
+  string str = "";
+
+  // Thank you cpp doc dwelling lambda wizards for this one
+  // See docs above. Just wanna make this more explicit
+  std::function<void(char, fs::perms)> addPermission =
+      [pPath, &str](char op, fs::perms perm) {
+        // I lied. Gotta use permissions for proper bit mask with &
+        str +=
+            ((perm & fs::status(pPath).permissions()) == fs::perms::none ? '-'
+                                                                         : op);
+      };
+#ifdef _WIN32
+  addPermission('r', fs::perms::owner_read);
+  addPermission('w', fs::perms::owner_write);
+#else
+  addPermission('r', fs::perms::owner_read);
+  addPermission('w', fs::perms::owner_write);
+  addPermission('x', fs::perms::owner_exec);
+  addPermission('r', fs::perms::group_read);
+  addPermission('w', fs::perms::group_write);
+  addPermission('x', fs::perms::group_exec);
+  addPermission('r', fs::perms::others_read);
+  addPermission('w', fs::perms::others_write);
+  addPermission('x', fs::perms::others_exec);
+
+#endif // _WIN32
+
+  return str;
 }

@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <vector>
 using std::string, std::shared_ptr, std::make_shared;
 
 // Returns T/F if path is deleted using std::filesystem::remove
@@ -16,3 +17,4 @@ void createFile(std::filesystem::path parentPath, std::string fileName,
 void copyFile(std::filesystem::path copyPath);
 
 void pasteFile(std::filesystem::path parentPath);
+std::string getPermissionString(std::filesystem::path pPath);
