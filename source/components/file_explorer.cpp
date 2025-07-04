@@ -211,7 +211,18 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         copyFile(iterPath);
         return true;
       }
-      // Paste recent yank
+
+      // View behavior
+      if (event == Event::Character('v')) {
+        auto closeLambda = [=] { *modalBool = false; };
+        popupContainer->DetachAllChildren();
+        *currentPopupContent =
+            viewInfoPopUp(modalBool.get(), iterPath,
+                          getPermissionString(iterPath), closeLambda);
+        popupContainer->Add(*currentPopupContent);
+        *modalBool = true;
+        return true;
+      }
 
       return false;
     });

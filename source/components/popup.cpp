@@ -108,6 +108,30 @@ Component newOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
   return popup;
 }
 
+Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
+                        std::string permString,
+                        std::function<void()> closeLambda) {
+  Component textRender = Button(permString, [] {}, ButtonOption::Ascii());
+
+  Component bodyContainer = Container::Vertical({textRender});
+  Component bodyContainerEvents =
+      CatchEvent(bodyContainer, [modalFlag, closeLambda](Event event) {
+        if (event == Event::Character('x')) {
+          closeLambda();
+          return true;
+        }
+        return false;
+      });
+  shared_ptr<string> titleString =
+      make_shared<string>("[V]iew info: " + pPath.filename().string());
+  Component popup = Renderer(bodyContainerEvents, [titleString, bodyContainer] {
+    return window(text(*titleString), bodyContainer->Render()) |
+           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
+           center;
+  });
+  return popup;
+}
+
 /* TODO: These should have corresponding keybinds in filexplorer
   Component openButton, openWithButton, previewButton,
    TODO: more button options. viewInfo, rename, copy, paste,

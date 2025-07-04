@@ -19,3 +19,7 @@ Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 Component newOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
                          std::shared_ptr<std::string> fileName,
                          std::function<void()> refresh, bool *dirFlag);
+
+Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
+                        std::string permString,
+                        std::function<void()> closeLambda);
