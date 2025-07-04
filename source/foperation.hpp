@@ -18,3 +18,4 @@ void copyFile(std::filesystem::path copyPath);
 
 void pasteFile(std::filesystem::path parentPath);
 std::string getPermissionString(std::filesystem::path pPath);
+std::string getPreviewString(std::filesystem::path pPath);

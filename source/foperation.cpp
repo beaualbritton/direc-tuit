@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -98,10 +100,10 @@ std::string getPermissionString(std::filesystem::path pPath) {
   // See docs above. Just wanna make this more explicit
   std::function<void(char, fs::perms)> addPermission =
       [pPath, &permissionString](char op, fs::perms perm) {
-	// I lied. Gotta use permissions for proper bit mask with &
-	permissionString +=
-	    ((perm & fs::status(pPath).permissions()) == fs::perms::none ? '-'
-									 : op);
+        // I lied. Gotta use permissions for proper bit mask with &
+        permissionString +=
+            ((perm & fs::status(pPath).permissions()) == fs::perms::none ? '-'
+                                                                         : op);
       };
 #ifdef _WIN32
   addPermission('r', fs::perms::owner_read);
@@ -124,4 +126,22 @@ std::string getPermissionString(std::filesystem::path pPath) {
 #endif // _WIN32
 
   return permissionString;
+}
+
+std::string getPreviewString(std::filesystem::path pPath) {
+  std::string line;
+  std::ostringstream previewString;
+  if (fs::is_directory(pPath))
+    return "this is a dir! you shouldn't see this..";
+
+  std::ifstream previewFile(pPath);
+  if (!previewFile.is_open())
+    return "nil";
+
+  int count = 0;
+  while (std::getline(previewFile, line) && count < 90) {
+    previewString << line << "\n";
+    ++count;
+  }
+  return previewString.str();
 }

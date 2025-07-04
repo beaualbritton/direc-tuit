@@ -5,6 +5,7 @@
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <iterator>
 #include <memory>
 using namespace ftxui;
 
@@ -111,9 +112,19 @@ Component newOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
                         std::string permString,
                         std::function<void()> closeLambda) {
+  Component previewRender = Renderer([pPath] {
+    return paragraph(getPreviewString(pPath)) | size(HEIGHT, EQUAL, 5) | frame |
+           vscroll_indicator;
+  });
+  Component renderSeparator = Renderer([] { return separator(); });
   Component textRender = Button(permString, [] {}, ButtonOption::Ascii());
 
-  Component bodyContainer = Container::Vertical({textRender});
+  Component bodyContainer = Container::Vertical({});
+  if (!std::filesystem::is_directory(pPath)) {
+    bodyContainer->Add(previewRender);
+    bodyContainer->Add(renderSeparator);
+  }
+  bodyContainer->Add(textRender);
   Component bodyContainerEvents =
       CatchEvent(bodyContainer, [modalFlag, closeLambda](Event event) {
         if (event == Event::Character('x')) {
@@ -126,7 +137,7 @@ Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
       make_shared<string>("[V]iew info: " + pPath.filename().string());
   Component popup = Renderer(bodyContainerEvents, [titleString, bodyContainer] {
     return window(text(*titleString), bodyContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
+           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 10) |
            center;
   });
   return popup;
