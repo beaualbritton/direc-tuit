@@ -17,5 +17,8 @@ void createFile(std::filesystem::path parentPath, std::string fileName,
 void copyFile(std::filesystem::path copyPath);
 
 void pasteFile(std::filesystem::path parentPath);
+// helper for paste&rename
+std::string getStamp();
+
 std::string getPermissionString(std::filesystem::path pPath);
 std::string getPreviewString(std::filesystem::path pPath);

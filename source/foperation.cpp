@@ -5,10 +5,8 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
-#include <ostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -75,25 +73,8 @@ void pasteFile(std::filesystem::path parentDir) {
   fs::path currentCopyPath = getCopiedPath();
   fs::path currentCopyFileName = currentCopyPath.filename();
   // Checking if path exists in parent dir
-  if (fs::exists(parentDir / currentCopyFileName)) {
-    // my logic here is that i don't want to iterate and see how many copies
-    // there are. say i have copy n, then i'd need to check if copy n+1, n+2
-    // exist and change the copied filename accordingly (i.e., file_copy1.txt,
-    // file_copy2.txt).. fuck that!! instead, stamp it, and move on.
-    using std::ostringstream, std::chrono::system_clock;
-
-    // i'd rather use c++20 chrono::format but i'm worried about
-    // cross-compatability cobbled this together with hopes & dreams
-    // https://en.cppreference.com/w/cpp/chrono.html
-    // https://en.cppreference.com/w/cpp/chrono/c/time_t.html
-    system_clock::time_point tp = system_clock::now();
-    std::time_t tp_t = system_clock::to_time_t(tp);
-    std::tm *tpLocal = std::localtime(&tp_t);
-
-    ostringstream oString;
-    oString << std::put_time(tpLocal, "%y%m%d_%H%M%S"); // 1984 ahh formatting
-    currentCopyFileName += "copied @ " + oString.str();
-  };
+  if (fs::exists(parentDir / currentCopyFileName))
+    currentCopyFileName += "copied @ " + getStamp();
 
   // Evaluate path for copy options (vanilla for files, recursive for dirs, so
   // subdirectories are also copied)
@@ -109,6 +90,21 @@ void pasteFile(std::filesystem::path parentDir) {
   else {
     fs::copy(currentCopyPath, parentDir, fs::copy_options::overwrite_existing);
   }
+}
+// Helper function for paste & later rename
+std::string getStamp() {
+  using std::ostringstream, std::chrono::system_clock;
+  // i'd rather use c++20 chrono::format but i'm worried about
+  // cross-compatability cobbled this together with hopes & dreams
+  // https://en.cppreference.com/w/cpp/chrono.html
+  // https://en.cppreference.com/w/cpp/chrono/c/time_t.html
+  system_clock::time_point tp = system_clock::now();
+  std::time_t tp_t = system_clock::to_time_t(tp);
+  std::tm *tpLocal = std::localtime(&tp_t);
+
+  ostringstream oString;
+  oString << std::put_time(tpLocal, "%y%m%d_%H%M%S"); // 1984 ahh formatting
+  return oString.str();
 }
 std::string getPermissionString(std::filesystem::path pPath) {
 
