@@ -5,7 +5,6 @@
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
-#include <iterator>
 #include <memory>
 using namespace ftxui;
 
@@ -41,7 +40,8 @@ Component deleteOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
                             std::shared_ptr<std::string> renameString,
                             std::function<void()> refresh) {
-  Component renameInput, extensionText, renameConfirm, renameCancel;
+  Component renameInput, extensionText, renameConfirm, renameCancel, errorText;
+  shared_ptr<bool> pathExistsFlag = make_shared<bool>(false);
 
   shared_ptr<string> titleString =
       make_shared<string>("[R]enaming: " + pPath.filename().string());
@@ -50,16 +50,30 @@ Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
   renameInputOpts.on_enter = [=] {
     *titleString = "[R]ename " + pPath.filename().string() +
                    " to: " + *renameString + getExtension(pPath) + "?";
-  };
 
+    std::filesystem::path parentPath;
+    if (pPath.has_parent_path())
+      parentPath = pPath.parent_path();
+    if (exists(parentPath / (*renameString + getExtension(pPath)))) {
+      *renameString = "";
+      *pathExistsFlag = true;
+    } else {
+      *pathExistsFlag = false;
+    }
+  };
   renameInput = Input(renameString.get(), "filename", renameInputOpts);
   extensionText = Renderer([pPath] { return text(getExtension(pPath)); });
   renameConfirm = Button("[Y]es", refresh, ButtonOption::Ascii());
   renameCancel = Button(
       "[N]o", [modalFlag] { *modalFlag = false; }, ButtonOption::Ascii());
+  errorText = Renderer([] { return text("path exists!"); });
+
+  renameConfirm = Maybe(renameConfirm, [=] { return !*pathExistsFlag; });
+  renameCancel = Maybe(renameCancel, [=] { return !*pathExistsFlag; });
+  errorText = Maybe(errorText, [=] { return *pathExistsFlag; });
 
   Component buttonContainer =
-      Container::Horizontal({renameConfirm, renameCancel});
+      Container::Horizontal({errorText, renameConfirm, renameCancel});
   Component renameContainer =
       Container::Horizontal({renameInput, extensionText});
   Component bodyContainer =
