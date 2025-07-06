@@ -262,30 +262,6 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         [] { /*Empty lambda. This is just a placeholder for problem above*/ },
         ButtonOption::Ascii()));
   }
-
-  Component submitContainer = Container::Horizontal({});
-
-  Component submitButton, cancelButton;
-  // Submits current directory to .config for prefered directory to store info.
-
-  // Quits current operation (q behavior)
-  cancelButton =
-      Button("Cancel.", WindowRender::instance().getScreen().ExitLoopClosure(),
-             ButtonOption::Ascii());
-
-  submitButton = Button(
-      "Submit.",
-      [=] {
-        setPreferredPath(pPath);
-        WindowRender::instance().getScreen().ExitLoopClosure()();
-      },
-      ButtonOption::Ascii());
-  submitContainer->Add(submitButton);
-  submitContainer->Add(cancelButton);
-  pContainer->Add(Renderer(submitContainer, [submitContainer] {
-    return submitContainer->Render() |
-           size(HEIGHT, EQUAL, EXPLORER_HEIGHT * 0.125f);
-  }));
 }
 
 /*
