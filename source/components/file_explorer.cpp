@@ -148,6 +148,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         is_directory(iterPath) ? "" : "",
         [iterPath, pContainer, screen] {
           if (is_directory(iterPath)) {
+            addToRecents(iterPath);
             WindowRender::instance().getScreen().Post(
                 [=] { populate(pContainer, iterPath); });
           }
@@ -275,7 +276,8 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 void getUserPinned(Component pContainer, Component fileContainer) {
 
   Component globalContainer = Container::Vertical({});
-  Component recentContainer = Container::Vertical({});
+  Component recentContainer =
+      Container::Vertical({Renderer([] { return text("recents:"); })});
   path hDir = homeDir();
   Component homeButton = Button(
       ": " + (hDir.filename().string()),
@@ -319,9 +321,21 @@ void getUserPinned(Component pContainer, Component fileContainer) {
     globalContainer->Add(buttonWrapper);
   }
 
-  recentContainer->Add(Renderer([] { return text("none"); }));
+  std::vector<path> recentList = getRecentList();
+  for (path recent : recentList) {
+    Component currentRecentBtn = Button(
+        ": " + recent.filename().string(),
+        [recent, fileContainer] {
+          WindowRender::instance().getScreen().Post(
+              [=] { populate(fileContainer, recent); });
+        },
+        ButtonOption::Ascii());
+    recentContainer->Add(currentRecentBtn);
+  }
 
+  Component renderSeparator = Renderer([] { return separator(); });
   pContainer->Add(globalContainer);
+  pContainer->Add(renderSeparator);
   pContainer->Add(recentContainer);
 }
 // TODO: test this a little more -- sometimes causes issues on my Windows

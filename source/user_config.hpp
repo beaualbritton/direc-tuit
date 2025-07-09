@@ -22,3 +22,6 @@ void deletePin(std::filesystem::path pDir);
 // Copies to .config/userconfig.toml
 void copyToConfig(std::filesystem::path copyFile);
 std::filesystem::path getCopiedPath();
+
+void addToRecents(std::filesystem::path pPath);
+std::vector<std::filesystem::path> getRecentList();

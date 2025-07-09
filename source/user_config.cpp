@@ -128,9 +128,7 @@ void pinDirectory(filesystem::path pDir) {
     cout << "assigning path failed: " << err;
   }
 }
-/*
- * TODO: implement
- */
+
 void deletePin(filesystem::path pDir) {
   // Deletes selected path from pin list in .config/user_config.toml
   //
@@ -225,4 +223,53 @@ std::filesystem::path getCopiedPath() {
   } catch (const toml::parse_error &err) {
     cout << "retrieving copied file failed:" << err;
   }
+}
+
+void addToRecents(std::filesystem::path pPath) {
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    toml::array *recentsArray = config_table["recents"].as_array();
+    if (!recentsArray) {
+      config_table.insert_or_assign("recents", toml::array{});
+      recentsArray = config_table["recents"].as_array();
+    }
+    // Check if recents is bigger than 5 paths.
+    int maxRecentSize = 5;
+    if (recentsArray->size() >= maxRecentSize) {
+      // Remove the least recent
+      recentsArray->erase(recentsArray->begin());
+    }
+    // checking for duplicates
+    for (auto &index : *recentsArray) {
+      // reusing this from pinDirectory() ... ugly
+      if (index.is_string() && index.value<string>() == pPath.string())
+        return;
+    }
+    recentsArray->push_back(pPath.string());
+    ofstream configFile(filePath);
+    if (configFile) {
+      configFile << config_table;
+    }
+  } catch (const toml::parse_error &err) {
+    cout << "error adding recent folder:" << err;
+  }
+}
+std::vector<std::filesystem::path> getRecentList() {
+  std::vector<path> recentsVec;
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    toml::array *recentsArray = config_table["recents"].as_array();
+    if (!recentsArray) {
+      return std::vector<path>();
+    };
+    for (auto &recent : *recentsArray) {
+      auto *strRecent = recent.as_string();
+      if (strRecent != nullptr) {
+        recentsVec.emplace_back(strRecent->get());
+      }
+    }
+  } catch (const toml::parse_error &err) {
+    cout << "error retrieving recents" << err;
+  }
+  return recentsVec;
 }
