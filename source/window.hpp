@@ -18,7 +18,7 @@ public:
   // Contains activeWindow
   Component rootWindow;
 
-  void setupWindow();
+  void setupWindow(std::string argString);
   void run();
   void setWindow(Component);
   Component getWindow();

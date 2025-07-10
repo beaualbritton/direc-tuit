@@ -28,11 +28,16 @@ shared_ptr<bool> modalBool;
 Component popupContainer;
 shared_ptr<Component> currentPopupContent;
 
-Component fileExplorer() {
+Component fileExplorer(string argString) {
   modalBool = make_shared<bool>(false);
   currentPopupContent = make_shared<Component>();
   popupContainer = Container::Horizontal({});
   path currentPath = std::filesystem::current_path();
+  path argPath = argString;
+  if (std::filesystem::exists(argPath) && is_directory(argPath)) {
+    currentPath = argPath;
+    // handle incorrect args here;
+  }
   // Get current directory and sub-directories & files
   // container for fileButtons
 

@@ -8,7 +8,9 @@
 using namespace ftxui;
 using std::string;
 
-void WindowRender::setupWindow() { this->setWindow(fileExplorer()); }
+void WindowRender::setupWindow(string argString) {
+  this->setWindow(fileExplorer(argString));
+}
 
 /*
  * not currently in use as setWindow allows for nested active windows

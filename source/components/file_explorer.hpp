@@ -5,7 +5,7 @@
 #include <ftxui/dom/elements.hpp>
 using namespace ftxui;
 // Returns navigable terminal-based file explorer
-Component fileExplorer();
+Component fileExplorer(std::string argString);
 void populate(std::shared_ptr<ComponentBase> pContainer,
               const std::filesystem::path &pPath);
 void getUserPinned(Component pContainer, Component fileContainer);
