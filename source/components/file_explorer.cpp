@@ -33,10 +33,14 @@ Component fileExplorer(string argString) {
   currentPopupContent = make_shared<Component>();
   popupContainer = Container::Horizontal({});
   path currentPath = std::filesystem::current_path();
-  path argPath = argString;
-  if (std::filesystem::exists(argPath) && is_directory(argPath)) {
-    currentPath = argPath;
-    // handle incorrect args here;
+  path argPath;
+  if (!argString.empty()) {
+    // converting from relative to local, or else parentDirButton breaks
+    argPath = std::filesystem::absolute(argString);
+    if (std::filesystem::exists(argPath) && is_directory(argPath)) {
+      currentPath = argPath;
+      // TODO: handle incorrect args here;
+    }
   }
   // Get current directory and sub-directories & files
   // container for fileButtons
