@@ -1,9 +1,12 @@
 #include "foperation.hpp"
+#include "iostream"
 #include "user_config.hpp"
+#include "window.hpp"
 #include <chrono>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
+#include <ftxui/component/screen_interactive.hpp>
 #include <functional>
 #include <sstream>
 #include <string>
@@ -164,4 +167,17 @@ std::string getPreviewString(std::filesystem::path pPath) {
     ++count;
   }
   return previewString.str();
+}
+void openWith(std::filesystem::path pPath) {
+  auto &screen = WindowRender::instance().getScreen();
+  screen.ExitLoopClosure();
+  screen.Exit();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  std::filesystem::path editorPath = getExternalEditorPath();
+  std::string command =
+      editorPath.string() + " " + std::filesystem::absolute(pPath).string();
+  std::cout << "Executing: " << command << std::endl;
+  int status = std::system(command.c_str());
+  std::cout << "Exit status: " << status << std::endl;
 }

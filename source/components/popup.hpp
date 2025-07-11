@@ -23,3 +23,8 @@ Component newOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
                         std::string permString,
                         std::function<void()> closeLambda);
+
+Component openWithPopUp(bool *modalFlag, std::filesystem::path pPath,
+                        std::function<void()> openLambda);
+
+Component setEditorPopUp(bool *modalFlag);

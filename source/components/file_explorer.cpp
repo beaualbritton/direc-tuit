@@ -233,6 +233,17 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
         *modalBool = true;
         return true;
       }
+      // Open with behavior
+      if (event == Event::Character('o')) {
+        auto openLambda = [=] { openWith(iterPath); };
+        popupContainer->DetachAllChildren();
+        *currentPopupContent =
+            openWithPopUp(modalBool.get(), iterPath, openLambda);
+
+        popupContainer->Add(*currentPopupContent);
+        *modalBool = true;
+        return true;
+      }
 
       return false;
     });

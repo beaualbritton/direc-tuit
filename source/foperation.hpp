@@ -1,5 +1,4 @@
 #include <filesystem>
-#include <vector>
 using std::string, std::shared_ptr, std::make_shared;
 
 // Returns T/F if path is deleted using std::filesystem::remove
@@ -22,3 +21,5 @@ std::string getStamp();
 
 std::string getPermissionString(std::filesystem::path pPath);
 std::string getPreviewString(std::filesystem::path pPath);
+
+void openWith(std::filesystem::path pPath);

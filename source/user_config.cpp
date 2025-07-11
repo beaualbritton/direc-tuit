@@ -273,3 +273,46 @@ std::vector<std::filesystem::path> getRecentList() {
   }
   return recentsVec;
 }
+bool externalEditorSet() {
+  bool isSet = false;
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    auto editorPath = config_table["editor"];
+    if (editorPath)
+      isSet = true;
+  } catch (const toml::parse_error &err) {
+    cout << "error checking for editor" << err;
+  }
+  return isSet;
+}
+
+void setPathToEditor(std::filesystem::path editorPath) {
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    // if (std::filesystem::exists(editorPath))
+    config_table.insert_or_assign("editor", editorPath.string());
+    ofstream configFile(filePath);
+    if (configFile) {
+      configFile << config_table;
+    }
+
+  } catch (const toml::parse_error &err) {
+    cout << "copying file failed:" << err;
+  }
+}
+
+std::filesystem::path getExternalEditorPath() {
+  std::filesystem::path editorPath = "";
+  try {
+    toml::table config_table = toml::parse_file(filePath.string());
+    auto pathValue = config_table["editor"];
+    if (pathValue && pathValue.is_string()) {
+      std::string pathString = pathValue.as_string()->get();
+      editorPath = std::filesystem::path(pathString);
+    }
+
+  } catch (const toml::parse_error &err) {
+    cout << "error retrieving editor path :" << err;
+  }
+  return editorPath;
+}

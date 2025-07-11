@@ -25,3 +25,7 @@ std::filesystem::path getCopiedPath();
 
 void addToRecents(std::filesystem::path pPath);
 std::vector<std::filesystem::path> getRecentList();
+
+bool externalEditorSet();
+void setPathToEditor(std::filesystem::path editorPath);
+std::filesystem::path getExternalEditorPath();

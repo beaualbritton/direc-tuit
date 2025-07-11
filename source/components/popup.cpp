@@ -1,4 +1,5 @@
 #include "../foperation.hpp"
+#include "../user_config.hpp"
 #include <filesystem>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
@@ -6,6 +7,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <memory>
+#include <string>
 using namespace ftxui;
 
 Component horizontalPopup(std::string message, bool *modalFlag,
@@ -152,6 +154,63 @@ Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
   Component popup = Renderer(bodyContainerEvents, [titleString, bodyContainer] {
     return window(text(*titleString), bodyContainer->Render()) |
            size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 10) |
+           center;
+  });
+  return popup;
+}
+
+Component setEditorPopUp(bool *modalFlag) {
+  Component setEditorInput, setConfirm, setCancel;
+  shared_ptr<string> titleString = make_shared<string>("Set your editor!");
+
+  InputOption setEditorOptions = InputOption();
+  setEditorOptions.multiline = false;
+  shared_ptr<string> stringInput = make_shared<string>();
+
+  setEditorInput = Input(stringInput.get(), "editor path", setEditorOptions);
+  setConfirm = Button(
+      "[Y]es",
+      [stringInput, modalFlag] {
+        setPathToEditor(std::filesystem::path(*stringInput));
+        *modalFlag = false;
+      },
+      ButtonOption::Ascii());
+  setCancel = Button(
+      "[N]o", [modalFlag] { *modalFlag = false; }, ButtonOption::Ascii());
+
+  Component buttonContainer = Container::Horizontal({setConfirm, setCancel});
+  Component bodyContainer =
+      Container::Vertical({setEditorInput, buttonContainer});
+
+  Component popup = Renderer(bodyContainer, [titleString, bodyContainer] {
+    return window(text(*titleString), bodyContainer->Render()) |
+           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
+           center;
+  });
+  return popup;
+}
+
+Component openWithPopUp(bool *modalFlag, std::filesystem::path pPath,
+                        std::function<void()> openLambda) {
+  // Check if .config editor is set. If not, ask for it to be input.
+  if (!externalEditorSet()) {
+    return setEditorPopUp(modalFlag);
+  }
+  Component openText, openConfirm, openCancel;
+  std::filesystem::path editorPath = getExternalEditorPath();
+  openText = Renderer([=] {
+    return text("Open " + pPath.string() + " with: " + editorPath.string() +
+                "?");
+  });
+  openConfirm = Button("[Y]es", openLambda, ButtonOption::Ascii());
+  openCancel =
+      Button("[N]o", [=] { *modalFlag = false; }, ButtonOption::Ascii());
+  Component buttonContainer = Container::Horizontal({openConfirm, openCancel});
+  Component bodyContainer = Container::Vertical({openText, buttonContainer});
+
+  Component popup = Renderer(bodyContainer, [bodyContainer] {
+    return window(text(""), bodyContainer->Render()) |
+           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
            center;
   });
   return popup;
