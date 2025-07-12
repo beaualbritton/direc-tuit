@@ -167,17 +167,24 @@ std::string getPreviewString(std::filesystem::path pPath) {
   }
   return previewString.str();
 }
-// TODO: fix implementation std::system is the issue (cause bus error)
 void openWith(std::filesystem::path pPath) {
   auto &screen = WindowRender::instance().getScreen();
-  screen.ExitLoopClosure();
-  screen.Exit();
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   std::filesystem::path editorPath = getExternalEditorPath();
   std::string command =
       editorPath.string() + " " + std::filesystem::absolute(pPath).string();
-  std::cout << "Executing: " << command << std::endl;
-  int status = std::system(command.c_str());
-  std::cout << "Exit status: " << status << std::endl;
+  // This took hours of scouring the FTXUI docs.. Recent updates to their github
+  // pages documentation has left things quite sparse. Legit read the
+  // implementation and scratched my head for 90 mins before figuring out that I
+  // can pass a 'closure' lambda to WithRestoredIO (pretty much equivalent to
+  // std::atexit[](){} but takes closure lambda instead of void*. i tried
+  // implementing this too but no luck...) Now, editor can be ran inside
+  // FTXUI... and then once, quit, FTXUI will continue it's session...
+  // magicks!!!! If curious, please read.
+  // https://arthursonzogni.github.io/FTXUI/with__restored__io_8cpp_source.html
+  auto runEditorWithRestoredIO = screen.WithRestoredIO([=] {
+    std::cout << "Executing: " << command << std::endl;
+    return std::system(command.c_str());
+  });
+  screen.ExitLoopClosure();
+  runEditorWithRestoredIO();
 }
