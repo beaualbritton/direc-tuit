@@ -38,7 +38,9 @@ void initDirectory() {
     cout << "problem loading config";
   }
 }
-// Uses toml++ parsing for efficient&readable reads/writes to config
+// Username functionality not in use currently. Disregard. Read for
+// understanding of toml++ syntax (if curious)
+//  Uses toml++ parsing for efficient&readable reads/writes to config
 shared_ptr<string> getUsername() {
   shared_ptr<string> username = make_shared<string>();
   //  string *username = nullptr;
@@ -81,24 +83,6 @@ void setUsername(string *username) {
   // TODO: again more comprehensive catches
   catch (const toml::parse_error &err) {
     cout << "assigning username failed: " << err;
-  }
-}
-/*
- * sets the preferred path for produc-tuity files & such in .config/user_config
- */
-void setPreferredPath(filesystem::path pPath) {
-  try {
-    toml::table path_table = toml::parse_file(filePath.string());
-
-    path_table.insert_or_assign("path", (pPath.string()));
-    ofstream configFile(filePath);
-    if (configFile) {
-      configFile << path_table;
-    }
-  }
-  // TODO: again more comprehensive catches
-  catch (const toml::parse_error &err) {
-    cout << "assigning path failed: " << err;
   }
 }
 void pinDirectory(filesystem::path pDir) {

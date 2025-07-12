@@ -21,5 +21,6 @@ std::string getStamp();
 
 std::string getPermissionString(std::filesystem::path pPath);
 std::string getPreviewString(std::filesystem::path pPath);
-
+// TODO: fix implementation (change from std::system() to some sort of
+// consistent exec())
 void openWith(std::filesystem::path pPath);

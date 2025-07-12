@@ -36,9 +36,6 @@ void renamePath(std::filesystem::path pPath, string renameString) {
     parentPath = pPath.parent_path();
   // std::filesystem syntax '/' joins string to filename
   fs::rename(pPath, parentPath / (renameString + getExtension(pPath)));
-
-  // TODO: add some handling so that directories cant be renamed with file
-  // extensions & vice versa
 }
 
 std::string getExtension(std::filesystem::path pPath) {
@@ -136,6 +133,8 @@ std::string getPermissionString(std::filesystem::path pPath) {
   for (int i = 0; i < 6; ++i)
     permissionString += '-';
 #else
+  // this is ugly but i didn't figure i could loop thru (based on fs::perms not
+  // being iterable), plus it looks like this on official c++ reference docs...
   addPermission('r', fs::perms::owner_read);
   addPermission('w', fs::perms::owner_write);
   addPermission('x', fs::perms::owner_exec);
@@ -168,6 +167,7 @@ std::string getPreviewString(std::filesystem::path pPath) {
   }
   return previewString.str();
 }
+// TODO: fix implementation std::system is the issue (cause bus error)
 void openWith(std::filesystem::path pPath) {
   auto &screen = WindowRender::instance().getScreen();
   screen.ExitLoopClosure();

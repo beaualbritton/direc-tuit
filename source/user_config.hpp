@@ -15,6 +15,7 @@ shared_ptr<string> getUsername();
 void setUsername(string *username);
 
 void setPreferredPath(std::filesystem::path pPath);
+// Pin directory behaviors
 void pinDirectory(std::filesystem::path pDir);
 std::vector<std::filesystem::path> getPinnedDirs();
 void deletePin(std::filesystem::path pDir);
@@ -23,9 +24,11 @@ void deletePin(std::filesystem::path pDir);
 void copyToConfig(std::filesystem::path copyFile);
 std::filesystem::path getCopiedPath();
 
+// Adds up to 5 most recently visited directories
 void addToRecents(std::filesystem::path pPath);
 std::vector<std::filesystem::path> getRecentList();
 
+// Responsible for [O]pen with functionality. Currently in progress.
 bool externalEditorSet();
 void setPathToEditor(std::filesystem::path editorPath);
 std::filesystem::path getExternalEditorPath();
