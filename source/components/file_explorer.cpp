@@ -53,12 +53,6 @@ Component fileExplorer(string argString) {
       Container::Horizontal({fileContainer});
   populate(fileContainer, currentPath);
 
-  /*
-   TODO: ADD:
-   *  Keybinds for file operations (create, delete, open.)
-   *  Some more robust error handling (if directory shit is weird)
-   */
-
   Component explorer = Renderer(baseContainer, [=] {
     return window(text("file explorer"),
                   vbox({

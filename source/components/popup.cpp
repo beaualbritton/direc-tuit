@@ -215,8 +215,3 @@ Component openWithPopUp(bool *modalFlag, std::filesystem::path pPath,
   });
   return popup;
 }
-
-/* TODO: These should have corresponding keybinds in filexplorer
-  Component openButton, openWithButton, previewButton,
-   TODO: more button options. viewInfo, rename, copy, paste,
-*/
