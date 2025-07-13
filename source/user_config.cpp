@@ -207,6 +207,7 @@ std::filesystem::path getCopiedPath() {
   } catch (const toml::parse_error &err) {
     cout << "retrieving copied file failed:" << err;
   }
+  return std::filesystem::path("");
 }
 
 void addToRecents(std::filesystem::path pPath) {

@@ -71,6 +71,8 @@ void copyFile(std::filesystem::path copyPath) {
 void pasteFile(std::filesystem::path parentDir) {
   // get current copy path
   fs::path currentCopyPath = getCopiedPath();
+  if (!fs::exists(currentCopyPath))
+    return;
   fs::path currentCopyFileName = currentCopyPath.filename();
   // Checking if path exists in parent dir
   if (fs::exists(parentDir / currentCopyFileName))
