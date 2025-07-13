@@ -24,6 +24,7 @@ const int TERM_WIDTH = terminalSize.dimx;
 const int TERM_HEIGHT = terminalSize.dimy;
 const int EXPLORER_WIDTH = TERM_WIDTH * 0.85;
 const int EXPLORER_HEIGHT = TERM_HEIGHT * 0.75;
+const int BUTTONS_PER_ROW = 5;
 shared_ptr<bool> modalBool;
 Component popupContainer;
 shared_ptr<Component> currentPopupContent;
@@ -127,15 +128,14 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
     }
     return false;
   });
-
-  horizontalContainer->Add(Renderer(pinnedContainer, [pinnedContainer] {
-    return pinnedContainer->Render() |
-           size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.1875);
+  int pinContainerWidth = EXPLORER_WIDTH * 0.1875;
+  horizontalContainer->Add(Renderer(pinnedContainer, [=] {
+    return pinnedContainer->Render() | size(WIDTH, EQUAL, pinContainerWidth);
   }));
+  int bodyContainerWidth = EXPLORER_WIDTH * 0.825;
   horizontalContainer->Add(Renderer([] { return separator(); }));
-  horizontalContainer->Add(Renderer(bodyContainerEvents, [bodyContainer] {
-    return bodyContainer->Render() |
-           size(WIDTH, EQUAL, EXPLORER_WIDTH * 0.825) |
+  horizontalContainer->Add(Renderer(bodyContainerEvents, [=] {
+    return bodyContainer->Render() | size(WIDTH, EQUAL, bodyContainerWidth) |
            size(HEIGHT, EQUAL, EXPLORER_HEIGHT) | frame | vscroll_indicator;
   }));
 
@@ -241,10 +241,11 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
 
       return false;
     });
+    int buttonTextWidth = ((EXPLORER_WIDTH * 0.825)) / BUTTONS_PER_ROW;
     string textString = (iterPath.filename().string());
-    Component buttonText = Renderer([textString, iterPath] {
+    Component buttonText = Renderer([=] {
       return text(iterPath.empty() ? "Empty " : textString) |
-             size(WIDTH, EQUAL, ((EXPLORER_WIDTH * 0.825) - 4) / 5);
+             size(WIDTH, EQUAL, buttonTextWidth);
     });
 
     Component vContainer = Container::Vertical({catchFileEvents, buttonText});
@@ -253,7 +254,7 @@ void populate(shared_ptr<ComponentBase> pContainer, const path &pPath) {
     wrapContainer->Add(vContainer);
     wrapContainer->Add(renderSeparator);
     ++wrapCount;
-    if (wrapCount >= 5) {
+    if (wrapCount >= BUTTONS_PER_ROW) {
       bodyContainer->Add(wrapContainer);
       wrapCount = 0;
       wrapContainer = Container::Horizontal({});

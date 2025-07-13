@@ -9,7 +9,8 @@
 #include <memory>
 #include <string>
 using namespace ftxui;
-
+const int POPUP_WIDTH = 30;
+const int POPUP_HEIGHT = 5;
 Component horizontalPopup(std::string message, bool *modalFlag,
                           std::function<void()> onConfirm) {
   Component confirmButton, cancelButton;
@@ -19,8 +20,8 @@ Component horizontalPopup(std::string message, bool *modalFlag,
   Component popupBody = Container::Horizontal({confirmButton, cancelButton});
   Component popup = Renderer(popupBody, [popupBody, message] {
     return window(text(message), popupBody->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
-           border | center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT) | border | center;
   });
 
   return popup;
@@ -34,8 +35,8 @@ Component deleteOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
   Component optionContainer = Container::Vertical({deleteButton});
   Component popup = Renderer(optionContainer, [pPath, optionContainer] {
     return window(text(pPath.filename().string()), optionContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
-           center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT) | center;
   });
   return popup;
 }
@@ -83,8 +84,8 @@ Component renameOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 
   Component popup = Renderer(bodyContainer, [titleString, bodyContainer] {
     return window(text(*titleString), bodyContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
-           center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT) | center;
   });
   return popup;
 }
@@ -119,8 +120,8 @@ Component newOptionPopUp(bool *modalFlag, std::filesystem::path pPath,
 
   Component popup = Renderer(bodyContainer, [titleString, bodyContainer] {
     return window(text(*titleString), bodyContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
-           center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT) | center;
   });
   return popup;
 }
@@ -129,8 +130,8 @@ Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
                         std::string permString,
                         std::function<void()> closeLambda) {
   Component previewRender = Renderer([pPath] {
-    return paragraph(getPreviewString(pPath)) | size(HEIGHT, EQUAL, 5) | frame |
-           vscroll_indicator;
+    return paragraph(getPreviewString(pPath)) |
+           size(HEIGHT, EQUAL, POPUP_HEIGHT) | frame | vscroll_indicator;
   });
   Component renderSeparator = Renderer([] { return separator(); });
   Component textRender = Button(permString, [] {}, ButtonOption::Ascii());
@@ -153,8 +154,8 @@ Component viewInfoPopUp(bool *modalFlag, std::filesystem::path pPath,
       make_shared<string>("[V]iew info: " + pPath.filename().string());
   Component popup = Renderer(bodyContainerEvents, [titleString, bodyContainer] {
     return window(text(*titleString), bodyContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 10) |
-           center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT * 3) | center;
   });
   return popup;
 }
@@ -184,8 +185,8 @@ Component setEditorPopUp(bool *modalFlag) {
 
   Component popup = Renderer(bodyContainer, [titleString, bodyContainer] {
     return window(text(*titleString), bodyContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
-           center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT) | center;
   });
   return popup;
 }
@@ -210,8 +211,8 @@ Component openWithPopUp(bool *modalFlag, std::filesystem::path pPath,
 
   Component popup = Renderer(bodyContainer, [bodyContainer] {
     return window(text(""), bodyContainer->Render()) |
-           size(WIDTH, GREATER_THAN, 30) | size(HEIGHT, GREATER_THAN, 5) |
-           center;
+           size(WIDTH, GREATER_THAN, POPUP_WIDTH) |
+           size(HEIGHT, GREATER_THAN, POPUP_HEIGHT) | center;
   });
   return popup;
 }
