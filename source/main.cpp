@@ -10,6 +10,9 @@ int main(int argc, char *argv[]) {
   // Displaying fullscreen in terminal interface. Takes width/height of current
   // viewport. See ftxui/component/screen_interactive.hpp
   //
+  //
+  //Check config to see if toml file is initialized, if not, create it.
+  checkConfig();
   if (argc > 1)
     WindowRender::instance().setupWindow(argv[1]);
   else
