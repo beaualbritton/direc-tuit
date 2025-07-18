@@ -76,7 +76,7 @@ void pasteFile(std::filesystem::path parentDir) {
   fs::path currentCopyFileName = currentCopyPath.filename();
   // Checking if path exists in parent dir
   if (fs::exists(parentDir / currentCopyFileName))
-    currentCopyFileName += "copied @ " + getStamp();
+    currentCopyFileName += "copied @ " + getStamp() +getExtension(currentCopyFileName);
 
   // Evaluate path for copy options (vanilla for files, recursive for dirs, so
   // subdirectories are also copied)
@@ -90,7 +90,7 @@ void pasteFile(std::filesystem::path parentDir) {
   // Otherwise a file. Default is overwite. TODO: if this fucks anything up
   // change it
   else {
-    fs::copy(currentCopyPath, parentDir, fs::copy_options::overwrite_existing);
+    fs::copy(currentCopyPath, parentDir / currentCopyFileName, fs::copy_options::update_existing);
   }
 }
 // Helper function for paste & later rename
